@@ -1,0 +1,17 @@
+2026-07-02 18:21:17,061 | INFO | Sentinel OS Started
+2026-07-02 18:21:35,204 | INFO | User: write a python code
+2026-07-02 18:21:44,311 | INFO | User: hi
+2026-07-02 18:21:46,055 | INFO | User: ji
+2026-07-02 18:21:47,928 | INFO | User: 
+2026-07-02 18:21:48,075 | INFO | User: 
+2026-07-02 18:21:48,526 | INFO | User: 
+2026-07-02 18:21:54,876 | INFO | User: exit
+2026-07-02 18:21:54,876 | INFO | Sentinel Shutdown
+2026-07-02 18:21:54,876 | INFO | Model Selected: qwen3.6:latest
+2026-07-02 18:43:42,512 | INFO | Sentinel OS Started
+2026-07-02 18:43:44,525 | INFO | User: hi
+2026-07-02 18:43:44,525 | INFO | Model Selected: qwen3.6:latest
+2026-07-02 18:45:03,212 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-07-02 18:45:03,233 | INFO | Response Generated
+2026-07-02 18:46:30,216 | INFO | User: exit
+2026-07-02 18:46:30,216 | INFO | Sentinel Shutdown

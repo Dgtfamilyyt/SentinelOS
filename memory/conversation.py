@@ -1,8 +1,16 @@
+from ai.prompts import SYSTEM_PROMPT
+
+
 class Conversation:
 
     def __init__(self):
 
-        self.messages = []
+        self.messages = [
+            {
+                "role": "system",
+                "content": SYSTEM_PROMPT
+            }
+        ]
 
     def add_user(self, prompt):
 
@@ -25,3 +33,12 @@ class Conversation:
     def get_messages(self):
 
         return self.messages
+
+    def clear(self):
+
+        self.messages = [
+            {
+                "role": "system",
+                "content": SYSTEM_PROMPT
+            }
+        ]

@@ -1,5 +1,5 @@
 from ollama import chat
-
+from core.logger import logger
 from ai.router import AIRouter
 from memory.conversation import Conversation
 
@@ -12,11 +12,13 @@ class AIEngine:
 
         self.conversation = Conversation()
 
+
     def ask(self, prompt):
 
         model = self.router.get_model(prompt)
 
-        print(f"\n🧠 Model: {model}\n")
+        logger.info(f"Model Selected: {model}")
+        
 
         self.conversation.add_user(prompt)
 
@@ -26,6 +28,8 @@ class AIEngine:
         )
 
         answer = response.message.content
+        
+        logger.info("Response Generated")
 
         self.conversation.add_assistant(answer)
 
