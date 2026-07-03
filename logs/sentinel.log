@@ -18,3 +18,10 @@
 2026-07-02 21:01:39,081 | INFO | Sentinel OS Started
 2026-07-02 21:01:48,544 | INFO | User: exit
 2026-07-02 21:01:48,545 | INFO | Sentinel Shutdown
+2026-07-04 00:06:12,451 | INFO | Sentinel OS Started
+2026-07-04 00:06:25,930 | INFO | User: hi
+2026-07-04 00:06:25,930 | INFO | Model Selected: qwen3.6:latest
+2026-07-04 00:08:03,855 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-07-04 00:08:03,871 | INFO | Response Generated
+2026-07-04 00:08:10,937 | INFO | User: exit
+2026-07-04 00:08:10,937 | INFO | Sentinel Shutdown
