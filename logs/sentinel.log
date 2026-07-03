@@ -15,3 +15,6 @@
 2026-07-02 18:45:03,233 | INFO | Response Generated
 2026-07-02 18:46:30,216 | INFO | User: exit
 2026-07-02 18:46:30,216 | INFO | Sentinel Shutdown
+2026-07-02 21:01:39,081 | INFO | Sentinel OS Started
+2026-07-02 21:01:48,544 | INFO | User: exit
+2026-07-02 21:01:48,545 | INFO | Sentinel Shutdown
