@@ -95,3 +95,80 @@ Let me know your exact environment if you need path confirmation or automated sa
 2026-07-06 00:01:51,456 | INFO | Sentinel: 
 2026-07-06 00:11:38,293 | INFO | User: exit
 2026-07-06 00:11:38,293 | INFO | Sentinel Shutdown
+2026-07-06 00:38:11,133 | INFO | Sentinel OS Started
+2026-07-06 00:38:32,297 | INFO | User: what is my laptop spec
+2026-07-06 00:38:32,297 | INFO | Model Selected: qwen3.6:latest
+2026-07-06 00:40:20,858 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-07-06 00:40:20,881 | INFO | Response Generated
+2026-07-06 00:40:20,881 | INFO | Sentinel: Hello DGT, I'm Sentinel. I don't have direct access to your local hardware, but I can help you quickly pull your laptop's specifications depending on your operating system:
+
+**Windows**
+- Quick GUI: `Settings > System > About` (OS, CPU, RAM, Device Name)
+- Terminal/PowerShell: `systeminfo | findstr /I "OS Model Total Physical Memory"` or `Get-CimInstance Win32_ComputerSystem | Select Model, Manufacturer, TotalPhysicalMemory; Get-CimInstance Win32_Processor | Select Name, NumberOfCores; Get-CimInstance Win32_VideoController | Select Name`
+
+**macOS**
+- GUI: Apple menu \uf8ff > About This Mac
+- Terminal: `system_profiler SPHardwareDataType | grep -E "Model Identifier|Model Name|Processor Speed|Memory"`
+
+**Linux**
+- Terminal: `lscpu | grep "Model name"; free -h; lsblk; inxi -Fx --no-host` (if `inxi` is installed)
+
+Reply with your OS or paste the output, DGT, and I'll help you interpret it, suggest upgrades, or optimize performance.
+2026-07-06 00:40:59,857 | INFO | User: remember GPU 0	NVIDIA GeForce RTX 4050 Laptop GPU	Driver version:	32.0.16.1062	Driver date:	11-06-2026	DirectX version:	12 (FL 12.2)	Physical location:	PCI bus 1, device 0, function 0	Utilization	6%	Dedicated GPU memory	5.7/6.0 GB	Shared GPU memory	0.4/11.8 GB	GPU Memory	6.1/17.8 GB
+2026-07-06 00:40:59,860 | INFO | Model Selected: WhiteRabbitNeo/WhiteRabbitNeo-2.5-Qwen-2.5-Coder-7B:latest
+2026-07-06 00:41:24,600 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-07-06 00:41:24,600 | INFO | Response Generated
+2026-07-06 00:41:24,600 | INFO | Sentinel: Great! DGT, it seems you have an NVIDIA GeForce RTX 4050 Laptop GPU with the following specifications:
+
+- **GPU Model:** GeForce RTX 4050 Laptop GPU
+- **Driver Version:** 32.0.16.1062
+- **DirectX Version:** DirectX 12 (Feature Level 12.2)
+- **Physical Location:** PCI bus 1, device 0, function 0
+
+Your card is utilizing a portion of its GPU memory for the system.
+
+### Potential Improvements:
+
+1. **Driver Updates:**
+   - Your driver version `32.0.16.1062` is quite old.
+   - It's recommended to update it from [NVIDIA's official website](https://www.nvidia.com/en-us/geforce/drivers/) for better performance and bug fixes.
+
+### Utilization:
+- **GPU Utilization:** 6%
+   - This indicates that your GPU is currently underutilized. If you plan on running resource-intensive applications like gaming or high-end graphic tasks, it would benefit from a more active usage scenario.
+
+### Memory:
+- **Dedicated GPU Memory:** 5.7/6.0 GB
+   - You have around 5.7 GB of dedicated memory allocated to the GPU.
+   - If you're running multiple applications simultaneously or doing resource-intensive tasks, consider allocating more physical RAM to your system for better performance.
+
+### General Tips:
+- **System Maintenance:**
+  - Keep your operating system and software updated with regular patches and updates. This helps ensure stability, security, and optimal performance of hardware drivers.
+  
+- **Power Management:**
+  - Depending on the OS you're using, there may be power management settings that can affect GPU utilization. Check for any settings related to power saving modes or high-performance options.
+
+- **Application Compatibility:**
+  - Ensure applications you run are compatible with your GPU model and driver version.
+  
+Reply if you need further assistance in upgrading drivers or optimizing system performance based on these findings, DGT.
+2026-07-06 00:41:24,601 | INFO | User: 
+2026-07-06 00:41:24,601 | INFO | Model Selected: qwen3.6:latest
+2026-07-06 00:42:22,676 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-07-06 00:42:22,686 | INFO | Response Generated
+2026-07-06 00:42:22,686 | INFO | Sentinel: Hello DGT, I'm Sentinel. You shared your GPU details earlier, but I didn't receive a follow-up question. Let me know if you'd like help with:
+
+- Updating your NVIDIA drivers safely
+- Gathering your full system specifications (CPU, RAM, storage, OS)
+- Optimizing performance or power settings
+- Cybersecurity hardening, networking, coding, or AI engineering guidance
+
+Just reply with what you need next, DGT. I'm here to assist!
+2026-07-06 00:42:22,691 | INFO | User: 
+2026-07-06 00:42:22,691 | INFO | Model Selected: qwen3.6:latest
+2026-07-06 00:42:44,369 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-07-06 00:42:44,370 | INFO | Response Generated
+2026-07-06 00:42:44,370 | INFO | Sentinel: Hello DGT, I'm Sentinel. It looks like your last message came through empty. Whenever you're ready, just let me know what you'd like to tackle next—updating your RTX 4050 drivers, pulling your full system profile, optimizing performance/power settings, or diving into cybersecurity, networking, programming, or AI engineering. I'm here to assist whenever you are.
+2026-07-06 00:42:44,373 | INFO | User: exit
+2026-07-06 00:42:44,373 | INFO | Sentinel Shutdown
