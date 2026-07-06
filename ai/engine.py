@@ -1,14 +1,19 @@
-from ollama import chat
+from click import prompt
+
 from core.logger import logger
 from ai.router import AIRouter
 from memory.conversation import Conversation
+from models.router import ModelRouter
+from ai.client import AIClient
 
 
 class AIEngine:
 
     def __init__(self):
 
-        self.router = AIRouter()
+        self.router = ModelRouter()
+
+        self.client = AIClient()
 
         self.conversation = Conversation()
 
@@ -18,17 +23,14 @@ class AIEngine:
         model = self.router.get_model(prompt)
 
         logger.info(f"Model Selected: {model}")
-        
 
         self.conversation.add_user(prompt)
 
-        response = chat(
-            model=model,
-            messages=self.conversation.get_messages()
-        )
+        answer = self.client.generate(
+        model=model,
+        messages=self.conversation.get_messages()
+    )
 
-        answer = response.message.content
-        
         logger.info("Response Generated")
 
         self.conversation.add_assistant(answer)

@@ -1,4 +1,4 @@
-from pathlib import Path
+import os
 from tools.base import Tool
 
 
@@ -6,10 +6,13 @@ class ListFilesTool(Tool):
 
     name = "list_files"
 
-    description = "Lists files and folders in the current directory."
+    category = "filesystem"
+
+    description = "Lists all files and folders."
+
+    parameters = []
+
+    safe = True
 
     def execute(self):
-
-        return sorted(
-            [item.name for item in Path.cwd().iterdir()]
-        )
+        return os.listdir()

@@ -1,4 +1,4 @@
-from pathlib import Path
+import os
 from tools.base import Tool
 
 
@@ -6,13 +6,16 @@ class CreateFolderTool(Tool):
 
     name = "create_folder"
 
-    description = "Creates a folder."
+    category = "filesystem"
 
-    def execute(self, folder):
+    description = "Creates a new folder."
 
-        Path(folder).mkdir(
-            parents=True,
-            exist_ok=True
-        )
+    parameters = ["folder_name"]
 
-        return f"Folder '{folder}' created."
+    safe = True
+
+    def execute(self, folder_name):
+
+        os.makedirs(folder_name, exist_ok=True)
+
+        return f"Folder '{folder_name}' created."

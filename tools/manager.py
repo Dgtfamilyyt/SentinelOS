@@ -12,14 +12,28 @@ class ToolManager:
 
         return tool.execute(*args, **kwargs)
 
-    def available_tools(self):
+    def tool_names(self):
+
         return list(TOOLS.keys())
 
-    def tool_descriptions(self):
-        return [
-            {
+    def tool_metadata(self):
+
+        metadata = []
+
+        for tool in TOOLS.values():
+
+            metadata.append({
+
                 "name": tool.name,
+
+                "category": tool.category,
+
                 "description": tool.description,
-            }
-            for tool in TOOLS.values()
-        ]
+
+                "parameters": tool.parameters,
+
+                "safe": tool.safe
+
+            })
+
+        return metadata

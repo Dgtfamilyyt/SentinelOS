@@ -1,4 +1,3 @@
-from pathlib import Path
 from tools.base import Tool
 
 
@@ -6,16 +5,15 @@ class ReadFileTool(Tool):
 
     name = "read_file"
 
+    category = "filesystem"
+
     description = "Reads a text file."
+
+    parameters = ["filename"]
+
+    safe = True
 
     def execute(self, filename):
 
-        path = Path(filename)
-
-        if not path.exists():
-            return "File not found."
-
-        if path.is_dir():
-            return "That is a directory."
-
-        return path.read_text(encoding="utf-8")
+        with open(filename, "r", encoding="utf-8") as f:
+            return f.read()

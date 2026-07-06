@@ -172,3 +172,14 @@ Just reply with what you need next, DGT. I'm here to assist!
 2026-07-06 00:42:44,370 | INFO | Sentinel: Hello DGT, I'm Sentinel. It looks like your last message came through empty. Whenever you're ready, just let me know what you'd like to tackle next—updating your RTX 4050 drivers, pulling your full system profile, optimizing performance/power settings, or diving into cybersecurity, networking, programming, or AI engineering. I'm here to assist whenever you are.
 2026-07-06 00:42:44,373 | INFO | User: exit
 2026-07-06 00:42:44,373 | INFO | Sentinel Shutdown
+2026-07-06 19:12:51,321 | INFO | Sentinel OS Started
+2026-07-06 19:15:50,487 | INFO | User: hi do you remember my laptop spec
+2026-07-06 19:15:50,488 | INFO | Model Selected: qwen3.6:latest
+2026-07-06 19:17:26,250 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-07-06 19:17:26,272 | INFO | Response Generated
+2026-07-06 19:17:26,272 | INFO | Sentinel: Hello DGT, this is Sentinel. I don't retain memory of past conversations or hardware details between sessions, so I won't automatically recall your laptop specs. If you share them now, I'll gladly help you analyze compatibility, optimize performance, or assist with any setup questions. What are the specifications?
+2026-07-06 19:18:49,727 | INFO | User: exit
+2026-07-06 19:18:49,727 | INFO | Sentinel Shutdown
+2026-07-06 20:16:25,724 | INFO | Sentinel OS Started
+2026-07-06 20:16:29,660 | INFO | User: exit
+2026-07-06 20:16:29,660 | INFO | Sentinel Shutdown
