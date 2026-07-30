@@ -1,18 +1,23 @@
 import os
+
 from tools.base import Tool
 
 
-class ListFilesTool(Tool):
+class ListFiles(Tool):
 
     name = "list_files"
 
+    description = "List files inside a directory."
+
     category = "filesystem"
 
-    description = "Lists all files and folders."
+    parameters = {
+        "path": "string"
+    }
 
-    parameters = []
+    def execute(self, path="."):
 
-    safe = True
+        return os.listdir(path)
 
-    def execute(self):
-        return os.listdir()
+
+tool = ListFiles()

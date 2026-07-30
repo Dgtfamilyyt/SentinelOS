@@ -1,12 +1,20 @@
-from tools.filesystem.current_directory import CurrentDirectoryTool
-from tools.filesystem.list_files import ListFilesTool
-from tools.filesystem.read_file import ReadFileTool
-from tools.filesystem.create_folder import CreateFolderTool
+class ToolRegistry:
 
+    def __init__(self):
+        self.tools = {}
 
-TOOLS = {
-    CurrentDirectoryTool.name: CurrentDirectoryTool(),
-    ListFilesTool.name: ListFilesTool(),
-    ReadFileTool.name: ReadFileTool(),
-    CreateFolderTool.name: CreateFolderTool(),
-}
+    def register(self, tool):
+
+        self.tools[tool.name] = tool
+
+    def get(self, name):
+
+        return self.tools.get(name)
+
+    def all(self):
+
+        return self.tools.values()
+
+    def names(self):
+
+        return list(self.tools.keys())

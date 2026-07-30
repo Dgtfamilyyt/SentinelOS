@@ -1,27 +1,28 @@
-"""
-===========================================
-Sentinel OS
-Module: Base Tool
-
-Author: DGT
-
-Purpose:
-Defines the base class for every tool.
-===========================================
-"""
-
 from abc import ABC, abstractmethod
 
 
 class Tool(ABC):
+    """
+    Base class for every Sentinel tool.
+    """
 
-    # Metadata
     name = ""
-    category = ""
     description = ""
-    parameters = []
-    safe = True
+    category = ""
+
+    parameters = {}
 
     @abstractmethod
-    def execute(self, *args, **kwargs):
+    def execute(self, **kwargs):
+        """
+        Execute the tool.
+        """
         pass
+
+    def info(self):
+        return {
+            "name": self.name,
+            "description": self.description,
+            "category": self.category,
+            "parameters": self.parameters,
+        }

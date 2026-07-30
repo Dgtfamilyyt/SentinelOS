@@ -1,39 +1,40 @@
-from tools.registry import TOOLS
+import importlib
+import pkgutil
+
+from tools.registry import ToolRegistry
 
 
 class ToolManager:
 
-    def execute(self, tool_name, *args, **kwargs):
+    def __init__(self):
 
-        tool = TOOLS.get(tool_name)
+        self.registry = ToolRegistry()
 
-        if tool is None:
-            return f"Unknown tool: {tool_name}"
+    def discover(self):
 
-        return tool.execute(*args, **kwargs)
+        import tools
 
-    def tool_names(self):
+        for _, module_name, _ in pkgutil.walk_packages(
+            tools.__path__,
+            tools.__name__ + "."
+        ):
 
-        return list(TOOLS.keys())
+            try:
 
-    def tool_metadata(self):
+                module = importlib.import_module(module_name)
 
-        metadata = []
+                if hasattr(module, "tool"):
 
-        for tool in TOOLS.values():
+                    self.registry.register(module.tool)
 
-            metadata.append({
+            except Exception as e:
 
-                "name": tool.name,
+                print(f"Failed to load {module_name}: {e}")
 
-                "category": tool.category,
+    def get(self, name):
 
-                "description": tool.description,
+        return self.registry.get(name)
 
-                "parameters": tool.parameters,
+    def all(self):
 
-                "safe": tool.safe
-
-            })
-
-        return metadata
+        return self.registry.all()
