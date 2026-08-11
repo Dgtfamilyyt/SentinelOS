@@ -6,6 +6,7 @@ from tools.base import Tool
 from tools.registry import ToolRegistry
 from tools.validator import ToolValidator
 
+
 class ToolManager:
 
     def __init__(self):
@@ -35,13 +36,17 @@ class ToolManager:
                         and not inspect.isabstract(obj)
                     ):
                         tool = obj()
+
                         errors = self.validator.validate(tool)
+
                         if errors:
                             print(f"❌ Invalid tool: {obj.__name__}")
+
                             for error in errors:
-                                print(f"  - {error}")
+                                print(f"   - {error}")
 
                             continue
+
                         self.registry.register(tool)
 
             except Exception as e:
@@ -52,3 +57,48 @@ class ToolManager:
 
     def all(self):
         return self.registry.all()
+
+    def execute(self, name, parameters=None):
+
+        tool = self.registry.get(name)
+
+        if tool is None:
+            return {
+                "success": False,
+                "error": f"Tool not found: {name}"
+            }
+
+        if parameters is None:
+            parameters = {}
+
+        # Validate parameters before execution
+        parameter_errors = self.validator.validate_parameters(
+            tool,
+            parameters
+        )
+
+        if parameter_errors:
+            return {
+                "success": False,
+                "tool": name,
+                "error": "Invalid parameters",
+                "details": parameter_errors
+            }
+
+        try:
+
+            result = tool.execute(**parameters)
+
+            return {
+                "success": True,
+                "tool": name,
+                "result": result
+            }
+
+        except Exception as e:
+
+            return {
+                "success": False,
+                "tool": name,
+                "error": str(e)
+            }
