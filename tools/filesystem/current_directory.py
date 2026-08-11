@@ -1,18 +1,17 @@
 import os
+
 from tools.base import Tool
 
 
-class CurrentDirectoryTool(Tool):
+class CurrentDirectory(Tool):
 
     name = "current_directory"
 
-    category = "filesystem"
-
     description = "Returns the current working directory."
 
-    parameters = []
+    category = "system"
 
-    safe = True
+    parameters = {}
 
     def execute(self):
         return os.getcwd()

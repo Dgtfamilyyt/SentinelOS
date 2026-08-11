@@ -19,5 +19,3 @@ class ListFiles(Tool):
 
         return os.listdir(path)
 
-
-tool = ListFiles()
