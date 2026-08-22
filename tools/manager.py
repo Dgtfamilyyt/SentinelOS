@@ -14,21 +14,26 @@ class ToolManager:
         self.validator = ToolValidator()
 
     def discover(self):
-
         import tools
 
         for _, module_name, _ in pkgutil.walk_packages(
             tools.__path__,
             tools.__name__ + "."
         ):
-
             try:
-                module = importlib.import_module(module_name)
+                module = importlib.import_module(
+                    module_name
+                )
 
                 for _, obj in inspect.getmembers(
                     module,
                     inspect.isclass
                 ):
+
+                    # Only classes actually defined
+                    # inside this module.
+                    if obj.__module__ != module.__name__:
+                        continue
 
                     if (
                         issubclass(obj, Tool)
@@ -37,20 +42,30 @@ class ToolManager:
                     ):
                         tool = obj()
 
-                        errors = self.validator.validate(tool)
+                        errors = (
+                            self.validator.validate(tool)
+                        )
 
                         if errors:
-                            print(f"❌ Invalid tool: {obj.__name__}")
+                            print(
+                                f"Invalid tool: "
+                                f"{obj.__name__}"
+                            )
 
                             for error in errors:
-                                print(f"   - {error}")
+                                print(
+                                    f"   - {error}"
+                                )
 
                             continue
 
                         self.registry.register(tool)
 
-            except Exception as e:
-                print(f"Failed to load {module_name}: {e}")
+            except Exception as error:
+                print(
+                    f"Failed to load "
+                    f"{module_name}: {error}"
+                )
 
     def get(self, name):
         return self.registry.get(name)
@@ -58,47 +73,51 @@ class ToolManager:
     def all(self):
         return self.registry.all()
 
-    def execute(self, name, parameters=None):
+    def names(self):
+        return self.registry.names()
 
+    def execute(
+        self,
+        name,
+        parameters=None
+    ):
         tool = self.registry.get(name)
 
         if tool is None:
             return {
                 "success": False,
-                "error": f"Tool not found: {name}"
+                "error": (
+                    f"Tool not found: {name}"
+                )
             }
 
-        if parameters is None:
-            parameters = {}
-
-        # Validate parameters before execution
-        parameter_errors = self.validator.validate_parameters(
-            tool,
-            parameters
+        prepared, errors = (
+            self.validator.prepare_parameters(
+                tool,
+                parameters
+            )
         )
 
-        if parameter_errors:
+        if errors:
             return {
                 "success": False,
                 "tool": name,
                 "error": "Invalid parameters",
-                "details": parameter_errors
+                "details": errors,
             }
 
         try:
-
-            result = tool.execute(**parameters)
+            result = tool.execute(**prepared)
 
             return {
                 "success": True,
                 "tool": name,
-                "result": result
+                "result": result,
             }
 
-        except Exception as e:
-
+        except Exception as error:
             return {
                 "success": False,
                 "tool": name,
-                "error": str(e)
+                "error": str(error),
             }

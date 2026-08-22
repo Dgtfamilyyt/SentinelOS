@@ -1,21 +1,34 @@
-import os
 from tools.base import Tool
+from tools.security import resolve_workspace_path
 
 
 class CreateFolderTool(Tool):
 
     name = "create_folder"
 
+    description = (
+        "Creates a directory inside "
+        "the Sentinel workspace."
+    )
+
     category = "filesystem"
 
-    description = "Creates a new folder."
-
-    parameters = ["folder_name"]
-
-    safe = True
+    parameters = {
+        "folder_name": {
+            "type": "string",
+            "required": True,
+        }
+    }
 
     def execute(self, folder_name):
 
-        os.makedirs(folder_name, exist_ok=True)
+        path = resolve_workspace_path(
+            folder_name
+        )
 
-        return f"Folder '{folder_name}' created."
+        path.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        return str(path)

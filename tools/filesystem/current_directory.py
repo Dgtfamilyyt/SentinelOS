@@ -1,17 +1,21 @@
-import os
-
 from tools.base import Tool
+from tools.security import ensure_workspace
+from config.settings import WORKSPACE_ROOT
 
 
-class CurrentDirectory(Tool):
+class CurrentDirectoryTool(Tool):
 
     name = "current_directory"
 
-    description = "Returns the current working directory."
+    description = (
+        "Returns the Sentinel workspace directory."
+    )
 
-    category = "system"
+    category = "filesystem"
 
     parameters = {}
 
     def execute(self):
-        return os.getcwd()
+        ensure_workspace()
+
+        return str(WORKSPACE_ROOT)

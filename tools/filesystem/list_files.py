@@ -1,21 +1,41 @@
-import os
-
 from tools.base import Tool
+from tools.security import resolve_workspace_path
 
 
-class ListFiles(Tool):
+class ListFilesTool(Tool):
 
     name = "list_files"
 
-    description = "List files inside a directory."
+    description = (
+        "Lists files inside a Sentinel "
+        "workspace directory."
+    )
 
     category = "filesystem"
 
     parameters = {
-        "path": "string"
+        "path": {
+            "type": "string",
+            "required": False,
+            "default": ".",
+        }
     }
 
     def execute(self, path="."):
 
-        return os.listdir(path)
+        target = resolve_workspace_path(path)
 
+        if not target.exists():
+            raise FileNotFoundError(
+                f"Directory not found: {path}"
+            )
+
+        if not target.is_dir():
+            raise NotADirectoryError(
+                f"Not a directory: {path}"
+            )
+
+        return sorted(
+            item.name
+            for item in target.iterdir()
+        )

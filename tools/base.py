@@ -14,9 +14,6 @@ class Tool(ABC):
 
     @abstractmethod
     def execute(self, **kwargs):
-        """
-        Execute the tool.
-        """
         pass
 
     def info(self):

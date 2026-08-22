@@ -2,42 +2,52 @@ class IntentEngine:
 
     def classify(self, prompt: str):
 
-        text = prompt.lower()
+        text = prompt.strip().lower()
 
         if "list files" in text:
             return {
                 "type": "tool",
                 "tool": "list_files",
-                "args": []
+                "parameters": {}
             }
 
         if "current directory" in text:
             return {
                 "type": "tool",
                 "tool": "current_directory",
-                "args": []
+                "parameters": {}
             }
 
         if text.startswith("read "):
 
-            filename = prompt[5:]
+            filename = (
+                prompt.strip()[5:].strip()
+            )
 
             return {
                 "type": "tool",
                 "tool": "read_file",
-                "args": [filename]
+                "parameters": {
+                    "filename": filename
+                }
             }
 
-        if text.startswith("create folder "):
-
-            folder = prompt[14:]
+        if text.startswith(
+            "create folder "
+        ):
+            folder = (
+                prompt.strip()[14:].strip()
+            )
 
             return {
                 "type": "tool",
                 "tool": "create_folder",
-                "args": [folder]
+                "parameters": {
+                    "folder_name": folder
+                }
             }
 
         return {
-            "type": "chat"
+            "type": "chat",
+            "task": "chat"
         }
