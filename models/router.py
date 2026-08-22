@@ -11,32 +11,45 @@ from models.registry import ModelRegistry
 class ModelRouter:
 
     def __init__(self):
-
         self.registry = ModelRegistry()
 
     def choose(self, task):
 
-        task = task.lower()
+        task = task.lower().strip()
 
         if task in [
             "chat",
             "math",
-            "general"
+            "general",
         ]:
-            return self.registry.model_name("general")
+            return self.registry.model_name(
+                "general"
+            )
 
-        elif task in [
+        if task in [
             "planning",
             "coding",
-            "tool"
+            "tool",
         ]:
-            return self.registry.model_name("planner")
+            return self.registry.model_name(
+                "planner"
+            )
 
-        elif task in [
+        if task in [
             "cyber",
             "security",
-            "malware"
-        ]:
-            return self.registry.model_name("cyber")
+            "malware",
 
-        return self.registry.model_name("deep")
+            # Sentinel security modes
+            "red",
+            "soc",
+            "blue",
+            "purple",
+        ]:
+            return self.registry.model_name(
+                "cyber"
+            )
+
+        return self.registry.model_name(
+            "deep"
+        )

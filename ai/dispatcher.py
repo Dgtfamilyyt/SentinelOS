@@ -1,23 +1,45 @@
 ﻿class Dispatcher:
 
-    def __init__(self, ai_engine, tool_manager):
+    def __init__(
+        self,
+        ai_engine,
+        tool_manager
+    ):
         self.ai = ai_engine
         self.tools = tool_manager
 
-    def dispatch(self, prompt, intent):
-        intent_type = intent.get("type")
+    def dispatch(
+        self,
+        prompt,
+        plan
+    ):
 
-        if intent_type == "tool":
-            tool_name = intent.get("tool")
-            parameters = intent.get("parameters", {})
+        plan_type = plan.get(
+            "type"
+        )
+
+        task = plan.get(
+            "task",
+            "chat"
+        )
+
+        if plan_type == "tool":
+
+            tool_name = plan.get(
+                "tool"
+            )
+
+            parameters = plan.get(
+                "parameters",
+                {}
+            )
 
             return self.tools.execute(
                 tool_name,
                 parameters
             )
 
-        if intent_type == "chat":
-            task = intent.get("task", "chat")
+        if plan_type == "chat":
 
             return self.ai.ask(
                 prompt,
@@ -26,5 +48,8 @@
 
         return {
             "success": False,
-            "error": f"Unknown intent type: {intent_type}"
+            "error": (
+                f"Unknown plan type: "
+                f"{plan_type}"
+            ),
         }
