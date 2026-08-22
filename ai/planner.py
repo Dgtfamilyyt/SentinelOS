@@ -18,7 +18,6 @@ class Planner:
     }
 
     def __init__(self, tool_manager):
-
         self.tools = tool_manager
         self.client = AIClient()
         self.router = ModelRouter()
@@ -28,10 +27,7 @@ class Planner:
         catalog = []
 
         for tool in self.tools.all():
-
-            catalog.append(
-                tool.info()
-            )
+            catalog.append(tool.info())
 
         return json.dumps(
             catalog,
@@ -39,14 +35,6 @@ class Planner:
         )
 
     def _fast_path(self, prompt):
-
-        """
-        Fast deterministic path for extremely
-        common built-in tool commands.
-
-        This avoids calling an LLM just to interpret
-        commands like 'list files'.
-        """
 
         text = prompt.strip().lower()
 
@@ -76,9 +64,7 @@ class Planner:
 
         if text.startswith("read "):
 
-            filename = (
-                prompt.strip()[5:].strip()
-            )
+            filename = prompt.strip()[5:].strip()
 
             return {
                 "type": "tool",
@@ -89,13 +75,9 @@ class Planner:
                 },
             }
 
-        if text.startswith(
-            "create folder "
-        ):
+        if text.startswith("create folder "):
 
-            folder = (
-                prompt.strip()[14:].strip()
-            )
+            folder = prompt.strip()[14:].strip()
 
             return {
                 "type": "tool",
@@ -108,76 +90,95 @@ class Planner:
 
         return None
 
-    def _fallback_task(self, prompt):
-
-        """
-        Lightweight fallback classification if
-        the planner model returns invalid JSON.
-        """
+    def _strong_task_hint(self, prompt):
 
         text = prompt.lower()
 
-        purple_words = [
+        # Purple FIRST because purple-team requests
+        # often contain both red and SOC terminology.
+        purple_signals = [
             "purple team",
+            "purple-team",
             "detection gap",
-            "detect this attack",
+            "detection coverage",
             "attack detection",
+            "detect this attack",
+            "telemetry should detect",
+            "attack vs detection",
+            "red-team technique with telemetry",
         ]
 
-        soc_words = [
+        red_signals = [
+            "authorized penetration test",
+            "penetration test",
+            "pentest",
+            "red team",
+            "red-team",
+            "reconnaissance",
+            "recon result",
+            "enumeration",
+            "exploit research",
+            "attack surface",
+            "exposed services",
+            "vulnerability assessment",
+        ]
+
+        soc_signals = [
             "soc",
             "blue team",
-            "alert",
-            "incident",
-            "threat hunt",
-            "ioc",
+            "blue-team",
             "siem",
+            "alert triage",
+            "incident response",
+            "threat hunt",
+            "threat hunting",
+            "ioc",
             "log analysis",
+            "authentication logs",
+            "security alert",
         ]
 
-        red_words = [
-            "red team",
-            "pentest",
-            "penetration test",
-            "recon",
-            "enumeration",
-            "vulnerability",
-            "exploit analysis",
-        ]
-
-        coding_words = [
-            "python",
-            "debug",
-            "code",
-            "programming",
-            "function",
-            "class",
+        coding_signals = [
             "traceback",
+            "debug this code",
+            "python code",
+            "programming",
+            "software bug",
+            "fix this code",
         ]
 
         if any(
-            word in text
-            for word in purple_words
+            signal in text
+            for signal in purple_signals
         ):
             return "purple"
 
         if any(
-            word in text
-            for word in soc_words
-        ):
-            return "soc"
-
-        if any(
-            word in text
-            for word in red_words
+            signal in text
+            for signal in red_signals
         ):
             return "red"
 
         if any(
-            word in text
-            for word in coding_words
+            signal in text
+            for signal in soc_signals
+        ):
+            return "soc"
+
+        if any(
+            signal in text
+            for signal in coding_signals
         ):
             return "coding"
+
+        return None
+
+    def _fallback_task(self, prompt):
+
+        strong_hint = self._strong_task_hint(prompt)
+
+        if strong_hint is not None:
+            return strong_hint
 
         return "chat"
 
@@ -185,8 +186,7 @@ class Planner:
 
         text = raw.strip()
 
-        # Handle models that accidentally wrap
-        # JSON inside Markdown fences.
+        # Remove accidental markdown fences.
         if text.startswith("```"):
 
             lines = text.splitlines()
@@ -206,21 +206,15 @@ class Planner:
             plan = json.loads(text)
 
         except json.JSONDecodeError:
-
             return {
                 "type": "chat",
-                "task": (
-                    self._fallback_task(prompt)
-                ),
+                "task": self._fallback_task(prompt),
             }
 
         if not isinstance(plan, dict):
-
             return {
                 "type": "chat",
-                "task": (
-                    self._fallback_task(prompt)
-                ),
+                "task": self._fallback_task(prompt),
             }
 
         plan_type = plan.get(
@@ -233,17 +227,21 @@ class Planner:
             self._fallback_task(prompt)
         )
 
+        # Strong deterministic signals override
+        # incorrect LLM classification.
+        strong_hint = self._strong_task_hint(prompt)
+
+        if strong_hint is not None:
+            task = strong_hint
+
         if task not in self.VALID_TASKS:
-            task = self._fallback_task(
-                prompt
-            )
+            task = self._fallback_task(prompt)
 
         if plan_type == "tool":
 
             tool_name = plan.get("tool")
 
             if tool_name not in self.tools.names():
-
                 return {
                     "type": "chat",
                     "task": task,
@@ -254,10 +252,7 @@ class Planner:
                 {}
             )
 
-            if not isinstance(
-                parameters,
-                dict
-            ):
+            if not isinstance(parameters, dict):
                 parameters = {}
 
             return {
@@ -279,16 +274,12 @@ class Planner:
         if fast is not None:
             return fast
 
-        planner_model = (
-            self.router.choose(
-                "planning"
-            )
+        planner_model = self.router.choose(
+            "planning"
         )
 
-        system_prompt = (
-            PLANNER_PROMPT.format(
-                tools=self._tool_catalog()
-            )
+        system_prompt = PLANNER_PROMPT.format(
+            tools=self._tool_catalog()
         )
 
         raw = self.client.generate(

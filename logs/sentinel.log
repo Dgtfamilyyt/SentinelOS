@@ -186,3 +186,14 @@ Just reply with what you need next, DGT. I'm here to assist!
 2026-08-22 15:19:17,886 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
 2026-08-22 15:19:26,906 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
 2026-08-22 15:19:44,495 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-08-22 15:24:52,597 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-08-22 15:25:30,499 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-08-22 15:25:38,168 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-08-22 15:26:00,969 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-08-22 15:26:00,969 | INFO | Task: soc
+2026-08-22 15:26:00,970 | INFO | Model Selected: CyberCrew/notmythos-8b:latest
+2026-08-22 15:26:12,901 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-08-22 15:26:12,902 | INFO | Response generated in soc mode
+2026-08-22 15:34:05,776 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-08-22 15:34:23,900 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-08-22 15:34:38,184 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
