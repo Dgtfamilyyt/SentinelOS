@@ -3,15 +3,21 @@ import inspect
 import pkgutil
 
 from tools.base import Tool
+from tools.policy import ExecutionPolicy
 from tools.registry import ToolRegistry
 from tools.validator import ToolValidator
 
 
 class ToolManager:
 
-    def __init__(self):
+    def __init__(self, policy=None):
         self.registry = ToolRegistry()
         self.validator = ToolValidator()
+        self.policy = (
+            policy
+            if policy is not None
+            else ExecutionPolicy()
+        )
 
     def discover(self):
         import tools
@@ -104,6 +110,26 @@ class ToolManager:
                 "tool": name,
                 "error": "Invalid parameters",
                 "details": errors,
+            }
+
+        permission = getattr(
+            tool,
+            "permission",
+            None
+        )
+
+        if not self.policy.allows(permission):
+            return {
+                "success": False,
+                "tool": name,
+                "error": (
+                    "Tool execution denied by policy"
+                ),
+                "permission": (
+                    self.policy.permission_name(
+                        permission
+                    )
+                ),
             }
 
         try:

@@ -1,4 +1,5 @@
 from tools.base import Tool
+from tools.policy import PermissionClass
 from tools.security import resolve_workspace_path
 
 
@@ -12,6 +13,8 @@ class CreateFolderTool(Tool):
     )
 
     category = "filesystem"
+
+    permission = PermissionClass.STATE_CHANGE
 
     parameters = {
         "folder_name": {
