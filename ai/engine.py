@@ -3,6 +3,8 @@ from ai.client import AIClient
 from ai.prompts import SYSTEM_PROMPT
 from ai.modes import get_mode_prompt
 from models.router import ModelRouter
+from contextlib import aclosing
+from ai.streaming import bounded_messages, stream_model
 
 
 class AIEngine:
@@ -22,25 +24,7 @@ class AIEngine:
 
         mode_prompt = get_mode_prompt(task)
 
-        messages = [
-            {
-                "role": "system",
-                "content": (
-                    SYSTEM_PROMPT
-                    + "\n\n"
-                    + mode_prompt
-                )
-            }
-        ]
-
-        messages.extend(self.history)
-
-        messages.append(
-            {
-                "role": "user",
-                "content": prompt
-            }
-        )
+        messages = bounded_messages(SYSTEM_PROMPT + "\n\n" + mode_prompt, self.history, prompt)
 
         answer = self.client.generate(
             model=model,
@@ -69,3 +53,11 @@ class AIEngine:
 
     def clear(self):
         self.history.clear()
+
+    async def ask_stream(self, prompt, *, task, history, memories, model, runtime):
+        selected = model or self.router.choose(task)
+        system = SYSTEM_PROMPT + "\n\n" + get_mode_prompt(task)
+        messages = bounded_messages(system, history, prompt, memories)
+        async with aclosing(stream_model(runtime, selected, messages)) as events:
+            async for event in events:
+                yield event

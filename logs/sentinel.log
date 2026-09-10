@@ -197,3 +197,52 @@ Just reply with what you need next, DGT. I'm here to assist!
 2026-08-22 15:34:05,776 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
 2026-08-22 15:34:23,900 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
 2026-08-22 15:34:38,184 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:08:39,780 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:08:39,781 | INFO | Task: chat
+2026-09-10 22:08:39,781 | INFO | Model Selected: qwen3:4b
+2026-09-10 22:08:46,819 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:08:46,819 | INFO | Response generated in chat mode
+2026-09-10 22:09:07,969 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:09:07,970 | INFO | Task: chat
+2026-09-10 22:09:07,970 | INFO | Model Selected: qwen3:4b
+2026-09-10 22:09:42,669 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:09:42,670 | INFO | Response generated in chat mode
+2026-09-10 22:10:18,226 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:10:18,226 | INFO | Task: chat
+2026-09-10 22:10:18,226 | INFO | Model Selected: qwen3:4b
+2026-09-10 22:10:36,493 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:10:36,493 | INFO | Response generated in chat mode
+2026-09-10 22:11:24,514 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:11:24,515 | INFO | Task: chat
+2026-09-10 22:11:24,515 | INFO | Model Selected: qwen3:4b
+2026-09-10 22:11:36,248 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:11:36,249 | INFO | Response generated in chat mode
+2026-09-10 22:13:52,421 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:13:52,421 | INFO | Task: coding
+2026-09-10 22:13:52,422 | INFO | Model Selected: WhiteRabbitNeo/WhiteRabbitNeo-2.5-Qwen-2.5-Coder-7B:latest
+2026-09-10 22:13:53,647 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:13:53,647 | INFO | Response generated in coding mode
+2026-09-10 22:14:17,686 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:14:51,643 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:14:51,643 | INFO | Task: chat
+2026-09-10 22:14:51,643 | INFO | Model Selected: qwen3:4b
+2026-09-10 22:15:09,896 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:15:09,896 | INFO | Response generated in chat mode
+2026-09-10 22:16:58,688 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:16:58,689 | INFO | Task: soc
+2026-09-10 22:16:58,689 | INFO | Model Selected: CyberCrew/notmythos-8b:latest
+2026-09-10 22:17:11,678 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:17:11,678 | INFO | Response generated in soc mode
+2026-09-10 22:17:59,881 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:17:59,882 | INFO | Task: chat
+2026-09-10 22:17:59,882 | INFO | Model Selected: qwen3:4b
+2026-09-10 22:18:13,090 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 22:18:13,090 | INFO | Response generated in chat mode
+2026-09-10 23:04:35,899 | INFO | HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-09-10 23:04:41,417 | INFO | HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-09-10 23:05:07,798 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2026-09-10 23:05:11,737 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 23:12:29,181 | INFO | HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-09-10 23:13:53,871 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2026-09-10 23:13:57,435 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-09-10 23:14:09,867 | INFO | HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"

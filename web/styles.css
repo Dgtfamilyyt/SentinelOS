@@ -241,6 +241,9 @@ a:focus-visible {
 
 .system-rail {
     border-right: 1px solid var(--line);
+    max-height: calc(100dvh - 112px);
+    overflow-y: auto;
+    scrollbar-color: var(--cyan-dim) transparent;
 }
 
 .signal-panel {
@@ -409,6 +412,44 @@ a:focus-visible {
     border-color: var(--amber);
     color: var(--amber);
 }
+
+[hidden] { display: none !important; }
+
+button:disabled, select:disabled { opacity: 0.5; cursor: not-allowed; }
+button:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 3px;
+}
+
+.control-label { display: block; margin-bottom: 0.55rem; color: var(--muted); font-size: 0.75rem; }
+.system-rail select, .memory-section textarea {
+    width: 100%; min-width: 0; padding: 0.7rem;
+    border: 1px solid var(--line); border-radius: 3px;
+    color: var(--text); background: #13100c;
+    font: inherit; font-size: 0.78rem;
+}
+.system-rail select { text-overflow: ellipsis; }
+#refreshModels { margin-top: 0.65rem; }
+.control-note { color: var(--muted); font-size: 0.72rem; line-height: 1.55; overflow-wrap: anywhere; }
+.saved-section .section-heading { gap: 0.5rem; }
+.memory-section textarea { resize: vertical; min-height: 60px; margin-bottom: 0.5rem; }
+.memory-list { padding: 0; list-style: none; max-height: 230px; overflow-y: auto; }
+.memory-list li { display: flex; align-items: flex-start; gap: 0.5rem; margin-top: 0.8rem; }
+.memory-list li span { min-width: 0; flex: 1; color: var(--text); font-size: 0.75rem; line-height: 1.5; overflow-wrap: anywhere; }
+.memory-list .quiet-button { flex-shrink: 0; padding: 0.4rem; font-size: 0.56rem; }
+.conversation-header h2 { overflow-wrap: anywhere; }
+.conversation-header > div { min-width: 0; }
+.conversation-header > button { flex-shrink: 0; }
+.message-body { padding-top: 1.5rem; }
+.message-status { color: var(--muted); letter-spacing: 0.02em; }
+.message-body .usage-note { margin-top: 0.8rem; color: var(--muted); font: 0.65rem/1.5 var(--mono); }
+.message[aria-busy="true"] .message-body p:empty::after { content: "Waiting for Sentinel…"; color: var(--muted); }
+.recovery-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem; }
+.stop-button { height: 42px; color: var(--amber); border-color: var(--cyan-dim); }
+.core-visual.listening .core-glyph { border-color: #7ae7d3; color: #b2ffee; box-shadow: 0 0 42px #7ae7d344; }
+.core-visual.listening .ring-alpha { border-top-color: #7ae7d3; border-left-color: #7ae7d3; }
+.core-visual.speaking .core-glyph { animation: core-active 0.7s ease-in-out infinite; color: #fff0c9; }
+.voice-privacy { margin: 0.8rem 0; }
 
 .transcript {
     flex: 1;
@@ -1001,6 +1042,7 @@ kbd {
 }
 
 @media (max-width: 760px) {
+    .saved-section, .memory-section { grid-column: 1 / -1; }
     .topbar {
         min-height: 64px;
     }
@@ -1023,6 +1065,7 @@ kbd {
 
     .system-rail {
         order: 2;
+        max-height: none;
         border-top: 1px solid var(--line);
         border-right: 0;
     }

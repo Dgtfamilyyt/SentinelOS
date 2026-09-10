@@ -1,5 +1,6 @@
 import asyncio
 import json
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Literal
@@ -15,6 +16,8 @@ from ai.ollama_runtime import get_ollama_runtime
 from core.command_center import CommandCenter
 from core.logger import logger
 from core.version import NAME, VERSION
+from memory.session_store import SessionStore
+from api.conversations import router as conversations_router
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -162,7 +165,8 @@ async def clear_session(request: Request):
 
 def create_app(
     command_center=None,
-    ollama_runtime=None
+    ollama_runtime=None,
+    session_store=None,
 ):
     @asynccontextmanager
     async def lifespan(app):
@@ -172,6 +176,8 @@ def create_app(
             else CommandCenter()
         )
         app.state.command_lock = asyncio.Lock()
+        app.state.active_sessions = set()
+        app.state.session_store = session_store or SessionStore(os.getenv("SENTINEL_DATA_DIR", BASE_DIR / "data"))
         app.state.ollama_runtime = (
             ollama_runtime
             if ollama_runtime is not None
@@ -197,6 +203,7 @@ def create_app(
     )
 
     app.include_router(router)
+    app.include_router(conversations_router)
     app.mount(
         "/static",
         StaticFiles(directory=WEB_DIR),

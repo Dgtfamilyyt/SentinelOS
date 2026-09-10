@@ -626,8 +626,45 @@ browsers. Voice input depends on the browser's Speech Recognition support;
 spoken responses use the browser's local speech engine when enabled.
 
 The interface reports whether Ollama is online or waiting in auto-start mode.
-Long requests show their current phase and elapsed time while the model starts
-or generates a response.
+Replies stream as they arrive. **Stop** or **Escape** closes the active model
+connection; already completed filesystem operations are not undone. Startup may
+finish in the background if stopped while the local server is launching.
+
+Progress comes from the backend: routing, runtime startup, model loading,
+generation, thinking (when reported by the model), and tool execution. The timer
+measures elapsed time only. Normal chat uses one answering-model call; ambiguous
+filesystem requests still use the planning model. Selecting an installed model
+overrides both planning and answering for that request. Model downloads remain
+explicit Ollama operations.
+
+Conversations and explicit **Remember this** notes are saved as local JSON under
+`data/` (or `SENTINEL_DATA_DIR`) and excluded from Git and static serving. The
+browser restores the last conversation; **New chat** starts a separate history,
+and **Delete chat** deletes only that conversation. **Forget** removes a saved
+note. Saved notes are shared across conversations. The newest or keyword-relevant
+notes are included up to 2,000 characters per request.
+
+Only the latest six complete turns within a 24,000-character message budget are
+sent to the model. Stopped and failed turns stay visible but are excluded from
+future model context. The complete transcript stays saved. Ollama uses an 8,192
+token context window and a 1,024-token response limit (256 for planning); the UI
+reports usage and when the response limit is reached. Character budgets are not
+exact token counts. Recent conversation context can therefore omit older details;
+use explicit saved notes for facts that should persist.
+
+**Voice conversation** is optional: tap the microphone, speak, and hear the reply.
+Tap the microphone during a response to interrupt; tap again to speak. Escape
+stops voice and generation. Speech support depends on the browser, and browser
+speech services may send audio online. The interface does not listen in the
+background or implement a wake word.
+
+The legacy `/api/chat` and `/api/session` endpoints remain available for existing
+clients. The browser uses `POST /api/chat/stream` with `message`, `session_id`, and
+optional `model`, returning newline-delimited JSON events (`status`, `delta`,
+`result`, `done`, or `error`). Sessions use `/api/sessions`, explicit notes use
+`/api/memories`, installed models use `/api/models`, and runtime recovery uses
+`POST /api/runtime/start`. See `/api/docs` for request schemas. One active request
+is allowed at a time; concurrent requests return 409. Run a single server worker.
 
 Keep the server bound to `127.0.0.1`. The alpha interface is intended for one
 local operator and does not provide network authentication.

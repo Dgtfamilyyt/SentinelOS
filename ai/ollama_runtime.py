@@ -38,6 +38,9 @@ class OllamaRuntime:
 
         if "://" not in configured_url:
             configured_url = f"http://{configured_url}"
+            parsed = urlparse(configured_url)
+            if parsed.port is None:
+                configured_url = configured_url.rstrip("/") + ":11434"
 
         self.base_url = configured_url.rstrip("/")
         self.executable = executable
@@ -100,6 +103,7 @@ class OllamaRuntime:
             try:
                 process = subprocess.Popen(
                     [executable, "serve"],
+                    env={**os.environ, "OLLAMA_HOST": self.base_url},
                     stdin=subprocess.DEVNULL,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,

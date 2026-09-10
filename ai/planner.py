@@ -1,4 +1,6 @@
 import json
+import re
+from contextlib import aclosing
 
 from ai.client import AIClient
 from ai.prompts import PLANNER_PROMPT
@@ -269,7 +271,7 @@ class Planner:
 
     def plan(self, prompt):
 
-        fast = self._fast_path(prompt)
+        fast = self.quick_plan(prompt)
 
         if fast is not None:
             return fast
@@ -300,3 +302,31 @@ class Planner:
             raw,
             prompt
         )
+
+    def quick_plan(self, prompt):
+        fast = self._fast_path(prompt)
+        if fast is not None:
+            return fast
+        action = re.search(r"\b(open|read|list|show|create|make|mkdir|display|find)\b", prompt, re.I)
+        resource = re.search(r"\b(file|files|folder|folders|directory|directories|workspace)\b|\.[a-z0-9]{1,8}\b", prompt, re.I)
+        if action and resource:
+            return None
+        return {"type": "chat", "task": self._fallback_task(prompt)}
+
+    async def plan_stream(self, prompt, runtime, model=None):
+        from ai.streaming import stream_model
+
+        yield {"type": "status", "stage": "routing"}
+        plan = self.quick_plan(prompt)
+        if plan is None:
+            raw = ""
+            messages = [{"role": "system", "content": PLANNER_PROMPT.format(tools=self._tool_catalog())},
+                        {"role": "user", "content": prompt}]
+            async with aclosing(stream_model(runtime, model or self.router.choose("planning"), messages, planning=True)) as events:
+                async for event in events:
+                    if event["type"] == "delta":
+                        raw += event["text"]
+                    else:
+                        yield event
+            plan = self._parse(raw, prompt)
+        yield {"type": "plan", "plan": plan}

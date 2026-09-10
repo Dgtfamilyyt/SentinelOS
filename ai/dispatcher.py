@@ -8,6 +8,20 @@
         self.ai = ai_engine
         self.tools = tool_manager
 
+    async def dispatch_stream(self, prompt, plan, **context):
+        from contextlib import aclosing
+
+        if plan.get("type") == "tool":
+            yield {"type": "status", "stage": "tool"}
+            result = self.tools.execute(plan.get("tool"), plan.get("parameters", {}))
+            yield {"type": "tool_result", "result": result}
+            return
+        if plan.get("type") != "chat":
+            raise ValueError("Unknown plan type")
+        async with aclosing(self.ai.ask_stream(prompt, task=plan.get("task", "chat"), **context)) as events:
+            async for event in events:
+                yield event
+
     def dispatch(
         self,
         prompt,

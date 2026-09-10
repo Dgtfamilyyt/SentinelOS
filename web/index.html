@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#080b0e">
+    <meta name="description" content="Sentinel OS: your private command interface for local AI conversations, voice, and workspace tools.">
+    <meta name="robots" content="noindex,nofollow">
     <title>Sentinel OS — Command Interface</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
@@ -37,7 +39,7 @@
         <aside class="system-rail" aria-label="Sentinel controls">
             <section class="rail-section identity-block">
                 <p class="eyebrow">OPERATING PROFILE</p>
-                <h1>Command<br>Interface</h1>
+                <h1>Sentinel<br>Command</h1>
                 <p class="muted">One secure channel to Sentinel's routed local intelligence.</p>
             </section>
 
@@ -46,6 +48,10 @@
                     <span>ROUTING</span>
                     <span class="live-label">AUTO</span>
                 </div>
+                <label class="control-label" for="modelSelect">Answering model</label>
+                <select id="modelSelect"><option value="">Automatic routing</option></select>
+                <button class="quiet-button" id="refreshModels" type="button">Refresh models</button>
+                <p class="control-note" id="modelNote">Checking installed models…</p>
                 <dl class="system-list">
                     <div>
                         <dt>Mode</dt>
@@ -60,6 +66,25 @@
                         <dd>Policy gated</dd>
                     </div>
                 </dl>
+            </section>
+
+            <section class="rail-section saved-section">
+                <div class="section-heading"><span>CONVERSATIONS</span><button class="quiet-button" id="newChatButton" type="button">New chat</button></div>
+                <label class="sr-only" for="sessionSelect">Saved conversation</label>
+                <select id="sessionSelect" aria-label="Saved conversation"><option>Loading…</option></select>
+                <p class="control-note">Saved on this computer.</p>
+            </section>
+
+            <section class="rail-section memory-section">
+                <div class="section-heading"><span>REMEMBERED</span></div>
+                <form id="memoryForm">
+                    <label class="sr-only" for="memoryInput">Something for Sentinel to remember</label>
+                    <textarea id="memoryInput" rows="2" maxlength="1000" placeholder="A preference or useful fact…" required></textarea>
+                    <button class="quiet-button" type="submit">Remember this</button>
+                </form>
+                <p class="control-note">Included across chats until you forget it.</p>
+                <ul id="memoryList" class="memory-list" aria-label="Saved memories"></ul>
+                <p id="memoryFeedback" class="control-note" role="status"></p>
             </section>
 
             <section class="rail-section quick-section">
@@ -83,17 +108,17 @@
                 </div>
             </section>
 
-            <p class="rail-footnote">LOCALHOST CHANNEL<br>NO CLOUD RELAY</p>
+            <p class="rail-footnote">LOCAL MODEL CHANNEL<br>BROWSER VOICE MAY USE ONLINE SERVICES</p>
         </aside>
 
         <section class="conversation-shell" aria-label="Conversation">
             <header class="conversation-header">
                 <div>
                     <p class="eyebrow">ACTIVE CHANNEL</p>
-                    <h2>SENTINEL / PRIMARY</h2>
+                    <h2 id="conversationTitle">SENTINEL / PRIMARY</h2>
                 </div>
                 <button class="quiet-button" id="clearButton" type="button">
-                    Clear session
+                    Delete chat
                 </button>
             </header>
 
@@ -111,8 +136,9 @@
 
             <div class="thinking" id="thinkingIndicator" hidden aria-label="Sentinel is processing">
                 <span></span><span></span><span></span>
-                <p id="thinkingCopy">ANALYZING REQUEST // 0.0S</p>
+                <p id="thinkingCopy">CONNECTING // 0.0S</p>
             </div>
+            <p class="sr-only" id="streamAnnouncement" role="status" aria-live="polite"></p>
 
             <form class="composer" id="composer">
                 <label class="sr-only" for="messageInput">Message Sentinel</label>
@@ -125,6 +151,7 @@
                     required
                 ></textarea>
                 <div class="composer-actions">
+                    <button class="quiet-button stop-button" id="stopButton" type="button" hidden>Stop</button>
                     <button class="icon-button" id="micButton" type="button" aria-label="Use voice input" aria-pressed="false">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M12 15a4 4 0 0 0 4-4V7a4 4 0 1 0-8 0v4a4 4 0 0 0 4 4Z"></path>
@@ -198,13 +225,15 @@
 
             <section class="voice-section">
                 <div>
-                    <strong>Voice response</strong>
-                    <small>Use your browser's local speech engine</small>
+                    <strong>Voice conversation</strong>
+                    <small>Tap the mic, speak, and hear the reply. Tap again to interrupt.</small>
                 </div>
-                <button class="toggle" id="voiceToggle" type="button" role="switch" aria-checked="false" aria-label="Toggle spoken responses">
+                <button class="toggle" id="voiceToggle" type="button" role="switch" aria-checked="false" aria-label="Toggle voice conversation">
                     <span></span>
                 </button>
             </section>
+            <p class="voice-privacy control-note">Voice uses your browser's speech services, which may send audio online. Listening starts only when you tap the microphone. Escape stops voice and generation.</p>
+            <p id="voiceFeedback" class="control-note" role="status"></p>
 
             <div class="security-note">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
