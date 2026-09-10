@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#080b0e">
+    <title>Sentinel OS — Command Interface</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="scanlines" aria-hidden="true"></div>
+
+    <header class="topbar">
+        <a class="brand" href="/" aria-label="Sentinel OS home">
+            <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 48 48" role="img">
+                    <path d="M24 3 40 9v13c0 10.8-6.5 18.2-16 23C14.5 40.2 8 32.8 8 22V9l16-6Z"></path>
+                    <path d="m16 24 5 5 11-12"></path>
+                </svg>
+            </span>
+            <span>
+                <strong>SENTINEL</strong>
+                <small>LOCAL INTELLIGENCE OS</small>
+            </span>
+        </a>
+
+        <div class="topbar-status" aria-label="System status">
+            <span class="status-pill" id="coreStatus">
+                <i aria-hidden="true"></i>
+                CORE SYNCING
+            </span>
+            <span class="clock" id="systemClock">--:--:--</span>
+        </div>
+    </header>
+
+    <main class="console-grid">
+        <aside class="system-rail" aria-label="Sentinel controls">
+            <section class="rail-section identity-block">
+                <p class="eyebrow">OPERATING PROFILE</p>
+                <h1>Command<br>Interface</h1>
+                <p class="muted">One secure channel to Sentinel's routed local intelligence.</p>
+            </section>
+
+            <section class="rail-section">
+                <div class="section-heading">
+                    <span>ROUTING</span>
+                    <span class="live-label">AUTO</span>
+                </div>
+                <dl class="system-list">
+                    <div>
+                        <dt>Mode</dt>
+                        <dd>Adaptive</dd>
+                    </div>
+                    <div>
+                        <dt>Model</dt>
+                        <dd>Task routed</dd>
+                    </div>
+                    <div>
+                        <dt>Execution</dt>
+                        <dd>Policy gated</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <section class="rail-section quick-section">
+                <div class="section-heading">
+                    <span>QUICK COMMANDS</span>
+                    <span>04</span>
+                </div>
+                <div class="quick-grid">
+                    <button type="button" data-prompt="current directory">
+                        <span>01</span> Workspace
+                    </button>
+                    <button type="button" data-prompt="list files">
+                        <span>02</span> File index
+                    </button>
+                    <button type="button" data-prompt="Help me triage a SOC alert using evidence, severity, confidence, and next investigation steps.">
+                        <span>03</span> SOC triage
+                    </button>
+                    <button type="button" data-prompt="Map a red-team technique to expected telemetry, detection coverage, gaps, and a retest plan.">
+                        <span>04</span> Purple map
+                    </button>
+                </div>
+            </section>
+
+            <p class="rail-footnote">LOCALHOST CHANNEL<br>NO CLOUD RELAY</p>
+        </aside>
+
+        <section class="conversation-shell" aria-label="Conversation">
+            <header class="conversation-header">
+                <div>
+                    <p class="eyebrow">ACTIVE CHANNEL</p>
+                    <h2>SENTINEL / PRIMARY</h2>
+                </div>
+                <button class="quiet-button" id="clearButton" type="button">
+                    Clear session
+                </button>
+            </header>
+
+            <div class="transcript" id="transcript" role="log" aria-live="polite" aria-relevant="additions">
+                <article class="message message-sentinel">
+                    <div class="message-meta">
+                        <span class="speaker">SENTINEL</span>
+                        <time>READY</time>
+                    </div>
+                    <div class="message-body">
+                        <p>Core interface online. Send a command, ask a question, or use the microphone to begin.</p>
+                    </div>
+                </article>
+            </div>
+
+            <div class="thinking" id="thinkingIndicator" hidden aria-label="Sentinel is processing">
+                <span></span><span></span><span></span>
+                <p>ANALYZING REQUEST</p>
+            </div>
+
+            <form class="composer" id="composer">
+                <label class="sr-only" for="messageInput">Message Sentinel</label>
+                <textarea
+                    id="messageInput"
+                    rows="1"
+                    maxlength="20000"
+                    placeholder="Enter directive…"
+                    autocomplete="off"
+                    required
+                ></textarea>
+                <div class="composer-actions">
+                    <button class="icon-button" id="micButton" type="button" aria-label="Use voice input" aria-pressed="false">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 15a4 4 0 0 0 4-4V7a4 4 0 1 0-8 0v4a4 4 0 0 0 4 4Z"></path>
+                            <path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"></path>
+                        </svg>
+                    </button>
+                    <button class="send-button" id="sendButton" type="submit">
+                        <span>Transmit</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m5 12 14-7-5 14-2-5-7-2Z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+            <div class="composer-hint">
+                <span><kbd>Enter</kbd> send</span>
+                <span><kbd>Shift</kbd> + <kbd>Enter</kbd> new line</span>
+                <span id="characterCount">0 / 20,000</span>
+            </div>
+        </section>
+
+        <aside class="signal-panel" aria-label="Live system telemetry">
+            <section class="core-display">
+                <div class="core-orbit" id="coreOrbit" aria-hidden="true">
+                    <span class="orbit orbit-one"></span>
+                    <span class="orbit orbit-two"></span>
+                    <span class="core-node"></span>
+                    <span class="sweep"></span>
+                </div>
+                <p class="eyebrow">NEURAL LINK</p>
+                <h2 id="linkState">STANDBY</h2>
+                <p class="muted" id="connectionCopy">Establishing local core connection.</p>
+            </section>
+
+            <section class="telemetry-section">
+                <div class="section-heading">
+                    <span>TELEMETRY</span>
+                    <span class="live-label">LIVE</span>
+                </div>
+                <dl class="telemetry-list">
+                    <div>
+                        <dt>Core version</dt>
+                        <dd id="versionValue">—</dd>
+                    </div>
+                    <div>
+                        <dt>Tools online</dt>
+                        <dd id="toolCount">—</dd>
+                    </div>
+                    <div>
+                        <dt>Session</dt>
+                        <dd id="sessionTime">00:00</dd>
+                    </div>
+                    <div>
+                        <dt>Voice</dt>
+                        <dd id="voiceStatus">Checking</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <section class="voice-section">
+                <div>
+                    <strong>Voice response</strong>
+                    <small>Use your browser's local speech engine</small>
+                </div>
+                <button class="toggle" id="voiceToggle" type="button" role="switch" aria-checked="false" aria-label="Toggle spoken responses">
+                    <span></span>
+                </button>
+            </section>
+
+            <div class="security-note">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3 20 6v6c0 5-3 8-8 10-5-2-8-5-8-10V6l8-3Z"></path>
+                    <path d="m9 12 2 2 4-5"></path>
+                </svg>
+                <p><strong>Execution boundary active</strong><br>Tool requests remain validated and policy controlled.</p>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="footer">
+        <span>SENTINEL OS // LOCAL COMMAND ENVIRONMENT</span>
+        <span id="requestCounter">REQUESTS 000</span>
+    </footer>
+
+    <script src="/static/app.js" defer></script>
+</body>
+</html>

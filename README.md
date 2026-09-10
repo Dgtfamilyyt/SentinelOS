@@ -40,6 +40,8 @@ Sentinel OS is currently under heavy development.
 * ✅ SQLite-based persistent memory foundation
 * ✅ Logging
 * ✅ Pytest test suite
+* ✅ Local FastAPI interface
+* ✅ Voice-capable browser command console
 
 ### In Development
 
@@ -50,8 +52,7 @@ Sentinel OS is currently under heavy development.
 * 🚧 Tool-result reasoning
 * 🚧 Semantic long-term memory
 * 🚧 Plugin loader
-* 🚧 Dashboard
-* 🚧 FastAPI backend
+* 🚧 Advanced security dashboard
 
 ---
 
@@ -602,6 +603,30 @@ python main.py
 
 ---
 
+## 7. Run the browser interface
+
+Start the local-only FastAPI interface:
+
+```powershell
+python -m uvicorn api.app:app --host 127.0.0.1 --port 8765
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8765
+```
+
+The browser console sends every prompt through the existing
+`CommandCenter -> Planner -> Dispatcher` flow. Text chat works in all modern
+browsers. Voice input depends on the browser's Speech Recognition support;
+spoken responses use the browser's local speech engine when enabled.
+
+Keep the server bound to `127.0.0.1`. The alpha interface is intended for one
+local operator and does not provide network authentication.
+
+---
+
 # 🧪 Tests
 
 Sentinel uses `pytest`.
@@ -697,8 +722,9 @@ Sentinel is designed to understand both sides of cybersecurity rather than treat
 * [ ] CVE intelligence
 * [ ] Report generation
 * [ ] Plugin loader
-* [ ] FastAPI backend
-* [ ] Web dashboard
+* [x] Local FastAPI interface
+* [x] Voice-capable command console
+* [ ] Advanced security dashboard
 
 ## v1.0
 
