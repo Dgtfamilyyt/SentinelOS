@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field, field_validator
 from starlette.concurrency import run_in_threadpool
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from ai.ollama_runtime import get_ollama_runtime
 from core.command_center import CommandCenter
 from core.logger import logger
 from core.version import NAME, VERSION
@@ -45,6 +46,8 @@ class HealthResponse(BaseModel):
     name: str
     version: str
     tools: list[str]
+    ollama: Literal["online", "standby"]
+    automatic_start: bool
 
 
 class SessionResponse(BaseModel):
@@ -86,12 +89,22 @@ router = APIRouter(prefix="/api")
 @router.get("/health", response_model=HealthResponse)
 async def health(request: Request):
     center = request.app.state.command_center
+    ollama_runtime = request.app.state.ollama_runtime
+    ollama_ready = await run_in_threadpool(
+        ollama_runtime.is_ready
+    )
 
     return HealthResponse(
         status="online",
         name=NAME,
         version=VERSION,
         tools=sorted(center.tools.names()),
+        ollama=(
+            "online"
+            if ollama_ready
+            else "standby"
+        ),
+        automatic_start=True,
     )
 
 
@@ -147,7 +160,10 @@ async def clear_session(request: Request):
     return SessionResponse(cleared=True)
 
 
-def create_app(command_center=None):
+def create_app(
+    command_center=None,
+    ollama_runtime=None
+):
     @asynccontextmanager
     async def lifespan(app):
         app.state.command_center = (
@@ -156,6 +172,11 @@ def create_app(command_center=None):
             else CommandCenter()
         )
         app.state.command_lock = asyncio.Lock()
+        app.state.ollama_runtime = (
+            ollama_runtime
+            if ollama_runtime is not None
+            else get_ollama_runtime()
+        )
         yield
 
     app = FastAPI(

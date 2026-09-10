@@ -573,7 +573,10 @@ pip install -r requirements.txt
 
 ## 4. Install Ollama
 
-Install and start Ollama before running Sentinel.
+Install Ollama before running Sentinel. Sentinel checks the local runtime on
+every model-backed request and starts `ollama serve` automatically when needed.
+Fast tool-only commands do not wake the model runtime, and remote Ollama hosts
+are never started automatically.
 
 Verify:
 
@@ -621,6 +624,10 @@ The browser console sends every prompt through the existing
 `CommandCenter -> Planner -> Dispatcher` flow. Text chat works in all modern
 browsers. Voice input depends on the browser's Speech Recognition support;
 spoken responses use the browser's local speech engine when enabled.
+
+The interface reports whether Ollama is online or waiting in auto-start mode.
+Long requests show their current phase and elapsed time while the model starts
+or generates a response.
 
 Keep the server bound to `127.0.0.1`. The alpha interface is intended for one
 local operator and does not provide network authentication.

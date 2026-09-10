@@ -111,7 +111,7 @@
 
             <div class="thinking" id="thinkingIndicator" hidden aria-label="Sentinel is processing">
                 <span></span><span></span><span></span>
-                <p>ANALYZING REQUEST</p>
+                <p id="thinkingCopy">ANALYZING REQUEST // 0.0S</p>
             </div>
 
             <form class="composer" id="composer">
@@ -148,13 +148,21 @@
 
         <aside class="signal-panel" aria-label="Live system telemetry">
             <section class="core-display">
-                <div class="core-orbit" id="coreOrbit" aria-hidden="true">
-                    <span class="orbit orbit-one"></span>
-                    <span class="orbit orbit-two"></span>
-                    <span class="core-node"></span>
-                    <span class="sweep"></span>
+                <div class="core-visual" id="coreOrbit" aria-hidden="true">
+                    <canvas id="coreCanvas"></canvas>
+                    <span class="core-ring ring-alpha"></span>
+                    <span class="core-ring ring-beta"></span>
+                    <span class="core-ring ring-gamma"></span>
+                    <span class="core-axis axis-horizontal"></span>
+                    <span class="core-axis axis-vertical"></span>
+                    <span class="core-glyph">S</span>
+                    <span class="core-readout readout-north">SYS.01</span>
+                    <span class="core-readout readout-east">NEURAL<br>ROUTE</span>
+                    <span class="core-readout readout-south">LOCAL // 11434</span>
+                    <span class="core-corner corner-nw"></span>
+                    <span class="core-corner corner-se"></span>
                 </div>
-                <p class="eyebrow">NEURAL LINK</p>
+                <p class="eyebrow">SENTINEL INTELLIGENCE CORE</p>
                 <h2 id="linkState">STANDBY</h2>
                 <p class="muted" id="connectionCopy">Establishing local core connection.</p>
             </section>
@@ -172,6 +180,10 @@
                     <div>
                         <dt>Tools online</dt>
                         <dd id="toolCount">—</dd>
+                    </div>
+                    <div>
+                        <dt>Ollama runtime</dt>
+                        <dd id="ollamaStatus">Checking</dd>
                     </div>
                     <div>
                         <dt>Session</dt>
