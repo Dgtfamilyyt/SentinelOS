@@ -171,6 +171,7 @@
                 <span><kbd>Shift</kbd> + <kbd>Enter</kbd> new line</span>
                 <span id="characterCount">0 / 20,000</span>
             </div>
+            <p id="voiceFeedback" class="control-note" role="status" style="padding: 0 1.5rem"></p>
         </section>
 
         <aside class="signal-panel" aria-label="Live system telemetry">
@@ -232,8 +233,7 @@
                     <span></span>
                 </button>
             </section>
-            <p class="voice-privacy control-note">Voice uses your browser's speech services, which may send audio online. Listening starts only when you tap the microphone. Escape stops voice and generation.</p>
-            <p id="voiceFeedback" class="control-note" role="status"></p>
+            <p class="voice-privacy control-note">Microphone recordings are transcribed locally. Tap once to record, again to transcribe (60 seconds maximum). Browser spoken responses may use online services. Escape cancels.</p>
 
             <div class="security-note">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -250,6 +250,7 @@
         <span id="requestCounter">REQUESTS 000</span>
     </footer>
 
+    <script src="/static/local-voice.js" defer></script>
     <script src="/static/app.js" defer></script>
 </body>
 </html>

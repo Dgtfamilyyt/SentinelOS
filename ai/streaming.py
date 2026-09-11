@@ -40,8 +40,14 @@ async def stream_model(runtime, model, messages, *, planning=False, transport=No
             if planning:
                 body["format"] = "json"
             if model.lower().startswith("qwen3:"):
-                body["think"] = False
+                # Older Qwen templates always open <think>. Keep Ollama's
+                # thinking parser enabled, but request Qwen's fast answer mode.
+                body["think"] = True
+                body["messages"] = [dict(message) for message in messages]
+                if body["messages"]:
+                    body["messages"][-1]["content"] += "\n/no_think"
             finished = False
+            has_answer = False
             last_stage = None
             async with client.stream("POST", "/api/chat", json=body) as response:
                 if response.status_code >= 400:
@@ -59,8 +65,11 @@ async def stream_model(runtime, model, messages, *, planning=False, transport=No
                         yield {"type": "status", "stage": stage, "model": model}
                         last_stage = stage
                     if message.get("content"):
+                        has_answer = True
                         yield {"type": "delta", "text": message["content"]}
                     if part.get("done"):
+                        if not has_answer:
+                            raise ModelFailure("generation_failed", "The model returned no answer within the response limit. Try another installed model or a shorter request.", model)
                         finished = True
                         yield {"type": "metrics", "model": model,
                                "input_tokens": part.get("prompt_eval_count", 0),

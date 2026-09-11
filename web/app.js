@@ -4,7 +4,7 @@ const $ = (id) => document.getElementById(id);
 const transcript = $("transcript");
 const messageInput = $("messageInput");
 const coreOrbit = $("coreOrbit");
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SpeechRecognition = window.isSecureContext && navigator.mediaDevices?.getUserMedia && window.MediaRecorder ? LocalSpeechRecognition : null;
 const saved = {
     get(key) { try { return localStorage.getItem(`sentinel-${key}`); } catch { return null; } },
     set(key, value) { try { localStorage.setItem(`sentinel-${key}`, value); } catch { /* Storage may be blocked. */ } },
@@ -12,7 +12,7 @@ const saved = {
 const state = {
     busy: false, controller: null, session: null, requestCount: 0,
     voice: saved.get("voice-conversation") === "enabled", recognition: null,
-    listening: false, speaking: false, voiceAborted: false, finalVoice: "",
+    listening: false, speaking: false, transcribing: false, requestingMic: false, voiceAborted: false, finalVoice: "",
     phase: "CONNECTING", started: 0, timer: null, operation: false, modelsRefreshing: false,
 };
 const sessionStartedAt = Date.now();
@@ -54,7 +54,7 @@ function createMessage(role, content, options = {}) {
     const body = document.createElement("div");
     body.className = "message-body";
     const text = document.createElement("p");
-    text.textContent = content;
+    text.textContent = content || (options.status === "cancelled" ? "Response stopped before text arrived." : options.status === "error" ? "This request failed. Retry with an installed model." : "");
     body.append(text);
     if (role !== "user") {
         const copy = document.createElement("button");
@@ -78,7 +78,7 @@ function createMessage(role, content, options = {}) {
 function syncVoiceVisual() {
     coreOrbit.classList.toggle("listening", state.listening);
     coreOrbit.classList.toggle("speaking", state.speaking);
-    $("voiceStatus").textContent = state.listening ? "Listening" : state.speaking ? "Speaking" : SpeechRecognition ? "Ready" : "Unavailable";
+    $("voiceStatus").textContent = state.requestingMic ? "Permission needed" : state.transcribing ? "Transcribing" : state.listening ? "Recording" : state.speaking ? "Speaking" : SpeechRecognition ? "Ready" : "Unavailable";
     updateControls();
 }
 
@@ -93,11 +93,11 @@ function setConnection(kind, detail) {
 }
 
 function updateControls() {
-    const locked = state.busy || state.operation || !state.session;
+    const locked = state.busy || state.operation || state.requestingMic || state.transcribing || state.listening || !state.session;
     for (const id of ["sendButton", "clearButton", "newChatButton", "sessionSelect", "modelSelect", "refreshModels"]) $(id).disabled = locked;
     $("modelSelect").disabled = $("refreshModels").disabled = locked || state.modelsRefreshing || state.listening || state.speaking;
     document.querySelectorAll("[data-prompt]").forEach((button) => { button.disabled = locked; });
-    $("stopButton").hidden = !state.busy && !state.speaking && !state.listening;
+    $("stopButton").hidden = !state.busy && !state.speaking && !state.listening && !state.transcribing && !state.requestingMic;
 }
 
 function setBusy(busy) {
@@ -122,6 +122,7 @@ function stopSpeech() {
 }
 
 function stopAll() {
+    if (state.listening || state.transcribing || state.requestingMic) $("voiceFeedback").textContent = "Voice input cancelled.";
     state.voiceAborted = true;
     state.finalVoice = "";
     state.recognition?.abort();
@@ -196,7 +197,10 @@ async function readEvents(response, onEvent) {
     } catch (error) {
         try { await reader.cancel(); } catch { /* The request may already be aborted. */ }
         throw error;
-    } finally { reader.releaseLock(); }
+    } finally {
+        await reader.cancel().catch(() => {});
+        reader.releaseLock();
+    }
 }
 
 async function sendMessage(rawMessage) {
@@ -386,10 +390,22 @@ function configureVoice() {
     if (!SpeechRecognition) { $("micButton").title = "Voice input is unavailable in this browser. You can still type."; $("voiceFeedback").textContent = "Voice input is unavailable in this browser. You can still type."; syncVoiceVisual(); return; }
     const recognition = new SpeechRecognition();
     state.recognition = recognition;
+    recognition.onrequest = () => {
+        state.requestingMic = true;
+        $("voiceFeedback").textContent = "Waiting for microphone access. Allow microphone access in the browser prompt. Escape cancels.";
+        syncVoiceVisual();
+    };
+    recognition.onprocessing = () => {
+        state.listening = false;
+        state.transcribing = true;
+        $("micButton").setAttribute("aria-pressed", "false");
+        $("voiceFeedback").textContent = "Transcribing on this computer… Escape cancels.";
+        syncVoiceVisual();
+    };
     recognition.lang = navigator.language || "en-US";
     recognition.interimResults = true;
     recognition.continuous = false;
-    recognition.onstart = () => { state.listening = true; $("voiceFeedback").textContent = "Listening. Tap the microphone to finish, or Escape to cancel."; $("micButton").setAttribute("aria-pressed", "true"); syncVoiceVisual(); };
+    recognition.onstart = () => { state.requestingMic = false; state.listening = true; $("voiceFeedback").textContent = "Recording. Tap the microphone again to transcribe, or Escape to cancel."; $("micButton").setAttribute("aria-pressed", "true"); syncVoiceVisual(); };
     recognition.onresult = (event) => {
         if (state.voiceAborted) return;
         messageInput.value = Array.from(event.results).map((result) => result[0].transcript).join(" ").slice(0, 20000);
@@ -399,9 +415,11 @@ function configureVoice() {
     recognition.onerror = (event) => {
         state.voiceAborted = true;
         state.finalVoice = "";
-        $("voiceFeedback").textContent = event.error === "not-allowed" ? "Microphone permission was denied. Enable it in browser settings or type your message." : "Voice input ended. Type your message or try the microphone again.";
+        $("voiceFeedback").textContent = event.message || ({"not-allowed": "Microphone access is blocked. Allow it in this site's browser permissions, then try again.", "no-device": "No microphone was found. Connect one and try again.", "audio-capture": "Cannot open the microphone. Check Windows microphone access and whether another app is using it."}[event.error] || "Voice input failed. Try again.");
     };
     recognition.onend = () => {
+        state.requestingMic = false;
+        state.transcribing = false;
         state.listening = false;
         $("micButton").setAttribute("aria-pressed", "false");
         syncVoiceVisual();
@@ -481,6 +499,7 @@ $("stopButton").addEventListener("click", stopAll);
 document.addEventListener("keydown", (event) => { if (event.key === "Escape") stopAll(); });
 $("micButton").addEventListener("click", async () => {
     if (!state.recognition) return;
+    if (state.requestingMic || state.transcribing) { stopAll(); $("voiceFeedback").textContent = "Voice input cancelled."; return; }
     if (state.listening) { state.recognition.stop(); return; }
     const wasBusy = state.busy;
     stopAll();

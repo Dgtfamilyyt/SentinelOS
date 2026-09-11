@@ -652,10 +652,33 @@ reports usage and when the response limit is reached. Character budgets are not
 exact token counts. Recent conversation context can therefore omit older details;
 use explicit saved notes for facts that should persist.
 
+For classic Qwen3 models, Sentinel requests `/no_think` fast-answer mode while
+keeping Ollama's thinking-field parser enabled for compatibility with older
+templates. Thinking text is not streamed into the answer. Empty model answers
+are reported as errors rather than silently saved as successful replies.
+
 **Voice conversation** is optional: tap the microphone, speak, and hear the reply.
+Microphone input now uses local Whisper transcription rather than browser speech
+recognition. Tap the microphone once to record and again to transcribe (maximum
+60 seconds). Allow microphone access when your browser asks. Permission, missing
+device, and transcription errors appear beside the composer. Escape cancels.
+
+Install local speech support once:
+
+```powershell
+pip install -r requirements-voice.txt
+python -c "from faster_whisper.utils import download_model; download_model('base', output_dir='data/speech-model')"
+```
+
+The initial model download needs internet. Afterwards microphone recordings are
+transcribed on this computer and are not saved or sent to a cloud transcription
+service. Browser spoken replies may still use online services. Closing a
+transcription request discards its result; a CPU transcription already in progress
+finishes in the background before another recording can be processed.
+
 Tap the microphone during a response to interrupt; tap again to speak. Escape
-stops voice and generation. Speech support depends on the browser, and browser
-speech services may send audio online. The interface does not listen in the
+stops voice and generation. Recording requires browser microphone permission and
+localhost or HTTPS. The interface does not listen in the
 background or implement a wake word.
 
 The legacy `/api/chat` and `/api/session` endpoints remain available for existing

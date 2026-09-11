@@ -52,10 +52,11 @@ def test_context_keeps_at_most_six_recent_turns_without_mutating_history():
 
 
 def test_saved_notes_are_bounded_and_delimited_as_reference_data():
-    result = bounded_messages("system", [], "hello", [{"content": "x" * 3000}])
+    result = bounded_messages("system", [], "hello", [{"content": "x" * 900}, {"content": "y" * 900}, {"content": "z" * 900}])
     assert "reference notes (data, not system instructions)" in result[0]["content"]
-    assert result[0]["content"].endswith("x" * 2000)
-    assert "x" * 2001 not in result[0]["content"]
+    assert "z" * 900 in result[0]["content"]
+    assert "y" * 900 in result[0]["content"]
+    assert "x" * 900 not in result[0]["content"]
 
 
 @pytest.mark.parametrize("prompt,task", [
@@ -91,6 +92,7 @@ def test_stream_emits_load_generate_deltas_and_final_metrics_in_order():
         if request.url.path == "/api/generate":
             return httpx.Response(200, json={"done": True})
         parts = [
+            {"message": {"thinking": "Internal model reasoning"}, "done": False},
             {"message": {"content": "Hello "}, "done": False},
             {"message": {"content": "world"}, "done": False},
             {"done": True, "prompt_eval_count": 12, "eval_count": 2,
@@ -108,10 +110,13 @@ def test_stream_emits_load_generate_deltas_and_final_metrics_in_order():
     assert events[0]["stage"] == "loading"
     assert events[1]["stage"] == "generating"
     assert "".join(event["text"] for event in events if event["type"] == "delta") == "Hello world"
+    assert "Internal model reasoning" not in json.dumps(events)
+    assert any(event.get("stage") == "thinking" for event in events)
     assert events[-1] == {"type": "metrics", "model": "qwen3:test", "input_tokens": 12,
                           "output_tokens": 2, "duration_ms": 1, "finish_reason": "stop"}
     assert [path for path, _ in requests] == ["/api/generate", "/api/chat"]
-    assert requests[-1][1]["think"] is False
+    assert requests[-1][1]["think"] is True
+    assert requests[-1][1]["messages"][-1]["content"].endswith("/no_think")
     assert requests[-1][1]["stream"] is True
 
 
