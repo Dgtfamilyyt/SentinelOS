@@ -377,7 +377,7 @@ class GoalUnderstandingEngine:
         text: str,
         context: dict[str, Any] | None = None,
     ) -> TaskSpecification | None:
-        normalized = text.lower().strip()
+        normalized = re.sub(r"[^\w\s/\.]", "", text.lower().strip()).rstrip('.').strip()
 
         # Workspace file inspection
         if normalized in {

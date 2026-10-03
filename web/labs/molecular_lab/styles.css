@@ -1,0 +1,6 @@
+/* Molecular Lab stylesheet */
+body { margin:0; font-family:sans-serif; }
+#toolbar { position:fixed; top:0; left:0; right:0; background:#222; color:#fff; padding:8px; display:flex; gap:8px; }
+#periodicTableContainer { position:fixed; left:0; top:40px; bottom:0; width:200px; overflow:auto; background:#f4f4f4; }
+#periodicTableContainer button { width:100%; margin:2px 0; }
+#molecularCanvas { position:absolute; left:200px; top:40px; right:0; bottom:0; }
