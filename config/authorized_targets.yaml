@@ -1,0 +1,22 @@
+# Sentinel Authorization Model Configuration
+# ============================================
+# Add authorized lab environments below.
+# The agent will ONLY execute network operations against listed targets.
+# All other targets are DENIED (fail-closed).
+#
+# authorized_targets:
+#   - label: "Metasploitable 2 VM"
+#     targets:
+#       - "192.168.56.101"
+#     auth_level: "lab"
+#     notes: "Local VirtualBox NAT network"
+#
+#   - label: "HackTheBox VPN"
+#     targets:
+#       - "10.10.0.0/16"
+#     auth_level: "lab"
+#     notes: "HTB VPN subnet"
+
+authorized_targets: []
+
+denied_targets: []

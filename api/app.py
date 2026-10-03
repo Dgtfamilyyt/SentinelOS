@@ -19,6 +19,7 @@ from core.version import NAME, VERSION
 from memory.session_store import SessionStore
 from api.conversations import router as conversations_router
 from api.voice import router as voice_router
+from api.agent import router as agent_router
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -206,6 +207,7 @@ def create_app(
     app.include_router(router)
     app.include_router(conversations_router)
     app.include_router(voice_router)
+    app.include_router(agent_router)
     app.mount(
         "/static",
         StaticFiles(directory=WEB_DIR),

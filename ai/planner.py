@@ -94,7 +94,11 @@ class Planner:
 
     def _strong_task_hint(self, prompt):
 
-        text = prompt.lower()
+        text = re.sub(r"[-\s]+", " ", prompt.lower()).strip()
+
+        def matches(signals):
+            return any(re.search(r"\b" + re.escape(signal) + r"\b", text)
+                       for signal in signals)
 
         # Purple FIRST because purple-team requests
         # often contain both red and SOC terminology.
@@ -108,6 +112,8 @@ class Planner:
             "telemetry should detect",
             "attack vs detection",
             "red-team technique with telemetry",
+            "red team technique with telemetry",
+            "attack versus detection",
         ]
 
         red_signals = [
@@ -123,6 +129,11 @@ class Planner:
             "attack surface",
             "exposed services",
             "vulnerability assessment",
+            "offensive security",
+            "exploit", "exploits", "payload", "payloads",
+            "reverse shell", "privilege escalation", "privilege boundaries",
+            "post exploitation", "credential access", "persistence",
+            "defense evasion", "evasion", "attack techniques", "attack path",
         ]
 
         soc_signals = [
@@ -138,6 +149,10 @@ class Planner:
             "log analysis",
             "authentication logs",
             "security alert",
+            "attack logs", "attacker logs", "malicious commands in logs",
+            "attack log analysis", "analyze attack log", "analyse attack log",
+            "analyze logs", "analyse logs", "analyze malware logs",
+            "incident investigation", "investigate an incident",
         ]
 
         coding_signals = [
@@ -149,29 +164,22 @@ class Planner:
             "fix this code",
         ]
 
-        if any(
-            signal in text
-            for signal in purple_signals
-        ):
+        if matches(purple_signals):
             return "purple"
 
-        if any(
-            signal in text
-            for signal in red_signals
-        ):
-            return "red"
-
-        if any(
-            signal in text
-            for signal in soc_signals
-        ):
+        # Incident-analysis intent wins over offensive terms in the evidence.
+        if matches(soc_signals):
             return "soc"
 
-        if any(
-            signal in text
-            for signal in coding_signals
-        ):
+        if matches(coding_signals):
             return "coding"
+
+        if matches(red_signals):
+            return "red"
+
+        if matches(["malware", "reverse engineering", "cybersecurity",
+                    "network security", "security research"]):
+            return "cyber"
 
         return None
 
