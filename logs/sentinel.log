@@ -379,3 +379,20 @@ Just reply with what you need next, DGT. I'm here to assist!
 2026-10-03 00:45:22,299 | INFO | Agent: recorded verification for step [step-01]: status=passed detail=Workspace files confirmed non-empty (5 items found).
 2026-10-03 00:45:22,299 | INFO | Agent Task [af839959] lifecycle: verifying -> completed (SentinelOS workspace inspected successfully. 5 files/directories present.)
 2026-10-03 00:45:22,299 | INFO | Agent: task [af839959] completed: SentinelOS workspace inspected successfully. 5 files/directories present.
+2026-10-03 15:27:18,441 | INFO | Sentinel OS Started
+2026-10-03 15:27:18,496 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-03 15:28:24,388 | INFO | User: hi
+2026-10-03 15:28:24,390 | INFO | Task: chat
+2026-10-03 15:28:24,390 | INFO | Model Selected: qwen3:4b
+2026-10-03 15:28:40,564 | INFO | Sentinel OS Started
+2026-10-03 15:28:40,615 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-03 15:29:44,656 | INFO | User: Uvicorn running on http://127.0.0.1:8000
+2026-10-03 15:29:44,660 | INFO | Task: chat
+2026-10-03 15:29:44,660 | INFO | Model Selected: qwen3:4b
+2026-10-03 15:40:29,909 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-03 15:40:37,990 | INFO | HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-10-03 15:43:40,595 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-03 15:44:02,847 | INFO | HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-10-03 15:58:38,075 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-03 15:58:43,691 | INFO | HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-10-03 16:03:57,619 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
