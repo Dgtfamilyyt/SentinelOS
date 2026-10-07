@@ -1,19 +1,52 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080b0e">
   <title>Sentinel Molecular Lab</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="toolbar">
-    <button id="resetBtn">Reset</button>
-    <button id="saveBtn">Save</button>
-    <button id="loadBtn">Load</button>
-    <span id="statusLabel">Status: UNKNOWN</span>
-  </div>
-  <div id="periodicTableContainer"></div>
-  <canvas id="molecularCanvas"></canvas>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Back to Sentinel Command"><span class="brand-mark">S</span><span><strong>SENTINEL</strong><small>MOLECULAR LAB</small></span></a>
+    <div class="toolbar">
+      <button class="mode active" data-mode="place">Place</button>
+      <button class="mode" data-mode="move">Select / move</button>
+      <button class="mode" data-mode="bond">Bond</button>
+      <button class="mode" data-mode="delete">Delete</button>
+      <label class="bond-order">Bond <select id="bondOrder" aria-label="Bond order"><option value="1">Single</option><option value="2">Double</option><option value="3">Triple</option></select></label>
+      <span class="separator"></span>
+      <button id="resetBtn">Reset</button><button id="saveBtn">Save</button><button id="loadBtn">Load</button>
+    </div>
+    <span class="local-tag"><i></i> LOCAL · DETERMINISTIC</span>
+  </header>
+
+  <main class="workspace">
+    <aside class="element-panel">
+      <div class="panel-title"><span class="eyebrow">BUILD</span><h1>Elements</h1><p>Choose an element, then click the scene to place it.</p></div>
+      <div id="periodicTableContainer" class="element-grid" aria-label="Element picker"></div>
+      <div class="selection-card" id="selectionCard"><span>SELECTED ELEMENT</span><strong id="selectedElement">Choose an element</strong><small id="elementDetail">Common valence —</small></div>
+      <p class="hint">In <b>Select / move</b>: <kbd>Drag</kbd> an atom to reposition · drag empty scene to orbit · scroll to zoom</p>
+    </aside>
+
+    <section class="scene-panel" aria-label="Three-dimensional molecular scene">
+      <div id="sceneHost" class="scene-host"><div class="scene-grid"></div><div class="scene-vignette"></div><div id="sceneLabels" class="scene-labels"></div><div class="axis-label">3D SPACE <span>Y / X / Z</span></div></div>
+      <div id="sceneError" class="scene-error" hidden></div>
+      <div class="scene-footer"><span id="interactionHint">Select an element to begin</span><span id="counts">0 ATOMS · 0 BONDS</span></div>
+    </section>
+
+    <aside class="molecule-panel">
+      <div class="panel-title"><span class="eyebrow">STRUCTURE READOUT</span><h2>Molecule</h2></div>
+      <div id="statusCard" class="status-card status-incomplete"><span id="statusDot"></span><span id="statusLabel">INCOMPLETE</span></div>
+      <div class="molecule-name" id="moleculeName">Untitled structure</div>
+      <div class="formula" id="formulaLabel">—</div>
+      <div class="readout-section"><span class="readout-heading">COMPOSITION</span><ul id="compositionList"><li>No atoms yet</li></ul></div>
+      <div class="readout-section"><span class="readout-heading">VALIDATION</span><p id="validationMessage">Add atoms and connect their bonds. Valence and known structures are checked locally.</p></div>
+      <div class="readout-section"><span class="readout-heading">INTERACTION</span><p id="toolMessage">Place: choose an element and click an open point in the scene.</p></div>
+      <div class="readout-foot">Recognizes only the built-in molecule registry.<br>Unknown structures are never guessed.</div>
+    </aside>
+  </main>
   <script type="module" src="molecular_lab.js"></script>
 </body>
 </html>

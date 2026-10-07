@@ -11,13 +11,14 @@ class AIEngine:
 
     def __init__(self):
         self.router = ModelRouter()
-        self.client = AIClient()
+        self.client = AIClient(router=self.router)
 
         self.history = []
 
     def ask(self, prompt, task="chat"):
 
-        model = self.router.choose(task)
+        route = self.router.resolve(task)
+        model = route.model
 
         logger.info(f"Task: {task}")
         logger.info(f"Model Selected: {model}")
@@ -28,7 +29,9 @@ class AIEngine:
 
         answer = self.client.generate(
             model=model,
-            messages=messages
+            messages=messages,
+            task=task,
+            route=route,
         )
 
         self.history.append(
@@ -55,9 +58,10 @@ class AIEngine:
         self.history.clear()
 
     async def ask_stream(self, prompt, *, task, history, memories, model, runtime):
-        selected = model or self.router.choose(task)
+        route = self.router.resolve(task, model)
+        selected = route.model
         system = SYSTEM_PROMPT + "\n\n" + get_mode_prompt(task)
         messages = bounded_messages(system, history, prompt, memories)
-        async with aclosing(stream_model(runtime, selected, messages)) as events:
+        async with aclosing(stream_model(runtime, selected, messages, route=route)) as events:
             async for event in events:
                 yield event

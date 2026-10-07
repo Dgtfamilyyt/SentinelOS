@@ -20,6 +20,9 @@ from memory.session_store import SessionStore
 from api.conversations import router as conversations_router
 from api.voice import router as voice_router
 from api.agent import router as agent_router
+from api.molecular import router as molecular_router
+from models.router import ModelRoutingError
+from models.omniroute import BackendFailure
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -53,6 +56,7 @@ class HealthResponse(BaseModel):
     tools: list[str]
     ollama: Literal["online", "standby"]
     automatic_start: bool
+    omniroute: dict[str, Any]
 
 
 class SessionResponse(BaseModel):
@@ -98,6 +102,15 @@ async def health(request: Request):
     ollama_ready = await run_in_threadpool(
         ollama_runtime.is_ready
     )
+    model_router = getattr(getattr(center, "ai", None), "router", None)
+    if model_router is None:
+        omniroute = {
+            "installed": False, "enabled": False, "configured": False,
+            "provider_available": False, "model_available": False,
+            "endpoint_reachable": False, "status": "unavailable",
+        }
+    else:
+        omniroute = await run_in_threadpool(model_router.health)
 
     return HealthResponse(
         status="online",
@@ -110,6 +123,7 @@ async def health(request: Request):
             else "standby"
         ),
         automatic_start=True,
+        omniroute=omniroute,
     )
 
 
@@ -125,6 +139,16 @@ async def chat(payload: ChatRequest, request: Request):
                 payload.message
             )
 
+    except ModelRoutingError as error:
+        raise HTTPException(
+            status_code=503,
+            detail={"code": error.code, "message": error.message},
+        ) from error
+    except BackendFailure as error:
+        raise HTTPException(
+            status_code=503,
+            detail={"code": error.code, "message": str(error)},
+        ) from error
     except Exception as error:
         logger.exception(
             "Web command processing failed"
@@ -208,6 +232,7 @@ def create_app(
     app.include_router(conversations_router)
     app.include_router(voice_router)
     app.include_router(agent_router)
+    app.include_router(molecular_router)
     app.mount(
         "/static",
         StaticFiles(directory=WEB_DIR),

@@ -113,7 +113,8 @@ def test_stream_emits_load_generate_deltas_and_final_metrics_in_order():
     assert "Internal model reasoning" not in json.dumps(events)
     assert any(event.get("stage") == "thinking" for event in events)
     assert events[-1] == {"type": "metrics", "model": "qwen3:test", "input_tokens": 12,
-                          "output_tokens": 2, "duration_ms": 1, "finish_reason": "stop"}
+                          "output_tokens": 2, "duration_ms": 1, "finish_reason": "stop",
+                          "backend": "local", "provider": "ollama", "request_id": events[-1]["request_id"]}
     assert [path for path, _ in requests] == ["/api/generate", "/api/chat"]
     assert requests[-1][1]["think"] is True
     assert requests[-1][1]["messages"][-1]["content"].endswith("/no_think")

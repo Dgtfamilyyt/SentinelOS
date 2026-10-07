@@ -16,7 +16,7 @@ const state = {
     phase: "CONNECTING", started: 0, timer: null, operation: false, modelsRefreshing: false,
 };
 const sessionStartedAt = Date.now();
-const phases = {routing: "ROUTING", starting: "STARTING OLLAMA", loading: "LOADING MODEL", thinking: "MODEL THINKING", generating: "GENERATING RESPONSE", tool: "RUNNING TOOL"};
+const phases = {routing: "ROUTING", starting: "STARTING OLLAMA", loading: "LOADING MODEL", thinking: "MODEL THINKING", generating: "GENERATING RESPONSE", fallback: "FALLING BACK TO LOCAL MODEL", tool: "RUNNING TOOL"};
 
 async function api(path, options = {}) {
     const response = await fetch(path, {headers: {"Content-Type": "application/json"}, ...options});

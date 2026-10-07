@@ -1,0 +1,8 @@
+{
+  "name": "sentinel-molecular-lab-vendor",
+  "private": true,
+  "description": "Pinned source metadata for the locally vendored Molecular Lab renderer",
+  "dependencies": {
+    "three": "0.186.1"
+  }
+}

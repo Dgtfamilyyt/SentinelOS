@@ -9,6 +9,7 @@ from ai.ollama_runtime import (
     OllamaRuntimeError,
 )
 from api.app import create_app
+from models.omniroute import BackendFailure
 
 
 class FakeAI:
@@ -105,6 +106,15 @@ def test_health_reports_discovered_tools():
         ],
         "ollama": "online",
         "automatic_start": True,
+        "omniroute": {
+            "installed": False,
+            "enabled": False,
+            "configured": False,
+            "provider_available": False,
+            "model_available": False,
+            "endpoint_reachable": False,
+            "status": "unavailable",
+        },
     }
 
 
@@ -178,6 +188,23 @@ def test_processing_failure_returns_safe_error():
     )
 
 
+def test_model_backend_failure_returns_structured_safe_error():
+    center, _, client = build_client()
+    center.result = BackendFailure(
+        "omniroute_auth_failed",
+        "OmniRoute rejected the configured authentication.",
+    )
+
+    with client:
+        response = client.post("/api/chat", json={"message": "hello"})
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == {
+        "code": "omniroute_auth_failed",
+        "message": "OmniRoute rejected the configured authentication.",
+    }
+
+
 def test_clear_session_uses_ai_engine_clear():
     center, _, client = build_client()
 
@@ -217,7 +244,7 @@ def test_ai_client_starts_ollama_before_generation(
     client = AIClient(runtime=runtime)
 
     answer = client.generate(
-        "test-model",
+        "qwen3:4b",
         [{"role": "user", "content": "hello"}],
     )
 

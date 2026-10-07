@@ -3,8 +3,12 @@ import asyncio
 import json
 
 import httpx
+import time
+import uuid
 
 from ai.ollama_runtime import OllamaRuntimeError
+from core.logger import logger
+from models.omniroute import BackendFailure
 
 
 class ModelFailure(RuntimeError):
@@ -16,7 +20,81 @@ class ModelFailure(RuntimeError):
         return {"type": "error", "code": self.code, "message": str(self), "model": self.model}
 
 
-async def stream_model(runtime, model, messages, *, planning=False, transport=None):
+async def stream_model(runtime, model, messages, *, planning=False, transport=None, route=None):
+    if route is not None and route.backend == "omniroute":
+        request_id = uuid.uuid4().hex
+        started = time.monotonic()
+        completed = False
+        try:
+            async for event in route_backend(route, transport).stream(
+                route, messages, planning=planning, request_id=request_id
+            ):
+                if event.get("type") == "metrics":
+                    completed = True
+                yield event
+            if completed:
+                _log_stream_request(route, request_id, started, True)
+            else:
+                _log_stream_request(route, request_id, started, False, "generation_failed")
+        except BackendFailure as error:
+            if route.fallback_to_local:
+                yield {"type": "status", "stage": "fallback", "model": route.local_model,
+                       "backend": "ollama", "reason": "OmniRoute failed; using the local model."}
+                try:
+                    async for event in _stream_local_model(runtime, route.local_model, messages, planning=planning,
+                                                           transport=transport):
+                        yield event
+                except BaseException:
+                    _log_stream_request(route, request_id, started, False, error.code, True)
+                    raise
+                _log_stream_request(route, request_id, started, True, error.code, True)
+                return
+            _log_stream_request(route, request_id, started, False, error.code)
+            raise ModelFailure(error.code, str(error), route.model) from error
+        except BaseException:
+            if not completed:
+                _log_stream_request(route, request_id, started, False, "cancelled")
+            raise
+        return
+    if route is None:
+        from models.router import ModelRoute, ModelRouter
+        task = "planning" if planning else ModelRouter.infer_task(model)
+        route = ModelRoute("local", task, model, model, "ollama")
+    request_id = uuid.uuid4().hex
+    started = time.monotonic()
+    completed = False
+    try:
+        async for event in _stream_local_model(runtime, model, messages, planning=planning, transport=transport):
+            if event.get("type") == "metrics":
+                completed = True
+                event = {**event, "backend": route.backend, "provider": route.provider,
+                         "request_id": request_id}
+            yield event
+        _log_stream_request(route, request_id, started, completed,
+                            None if completed else "generation_failed")
+    except ModelFailure as error:
+        _log_stream_request(route, request_id, started, False, error.code)
+        raise
+    except BaseException:
+        _log_stream_request(route, request_id, started, False, "cancelled")
+        raise
+
+
+def route_backend(route, transport=None):
+    # Kept lazy so local-only installations do not initialize remote plumbing.
+    from models.omniroute import OmniRouteBackend
+    return OmniRouteBackend(transport=transport)
+
+
+def _log_stream_request(route, request_id, started, success, failure_reason=None, fallback_used=False):
+    metadata = route.metadata(
+        request_id, latency_ms=round((time.monotonic() - started) * 1000),
+        success=success, failure_reason=failure_reason, fallback_used=fallback_used,
+    )
+    logger.info("Model request metadata: %s", json.dumps(metadata, sort_keys=True))
+
+
+async def _stream_local_model(runtime, model, messages, *, planning=False, transport=None):
     ready = await asyncio.to_thread(runtime.is_ready)
     if not ready:
         yield {"type": "status", "stage": "starting", "model": model}

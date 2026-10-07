@@ -21,8 +21,8 @@ class Planner:
 
     def __init__(self, tool_manager):
         self.tools = tool_manager
-        self.client = AIClient()
         self.router = ModelRouter()
+        self.client = AIClient(router=self.router)
 
     def _tool_catalog(self):
 
@@ -284,9 +284,8 @@ class Planner:
         if fast is not None:
             return fast
 
-        planner_model = self.router.choose(
-            "planning"
-        )
+        route = self.router.resolve("planning")
+        planner_model = route.model
 
         system_prompt = PLANNER_PROMPT.format(
             tools=self._tool_catalog()
@@ -304,6 +303,8 @@ class Planner:
                     "content": prompt,
                 },
             ],
+            task="planning",
+            route=route,
         )
 
         return self._parse(
@@ -330,7 +331,8 @@ class Planner:
             raw = ""
             messages = [{"role": "system", "content": PLANNER_PROMPT.format(tools=self._tool_catalog())},
                         {"role": "user", "content": prompt}]
-            async with aclosing(stream_model(runtime, model or self.router.choose("planning"), messages, planning=True)) as events:
+            route = self.router.resolve("planning", model)
+            async with aclosing(stream_model(runtime, route.model, messages, planning=True, route=route)) as events:
                 async for event in events:
                     if event["type"] == "delta":
                         raw += event["text"]

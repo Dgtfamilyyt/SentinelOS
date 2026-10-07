@@ -67,7 +67,7 @@ def test_engine_composes_shared_prompt_mode_history_and_unchanged_request(monkey
 
     captured = []
 
-    async def fake_stream(runtime, model, messages):
+    async def fake_stream(runtime, model, messages, *, route=None):
         captured.append(messages)
         yield {"type": "delta", "text": "test response"}
 

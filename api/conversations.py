@@ -9,10 +9,12 @@ import httpx
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field, field_validator
 from starlette.responses import StreamingResponse
+from starlette.concurrency import run_in_threadpool
 
 from ai.ollama_runtime import OllamaRuntimeError
 from ai.streaming import ModelFailure
 from models.profiles import MODELS
+from models.router import ModelRoutingError
 
 
 router = APIRouter(prefix="/api")
@@ -134,8 +136,21 @@ async def models(request: Request):
     except (httpx.HTTPError, ValueError, KeyError):
         pass
     names = installed | {model["name"] for model in MODELS.values()}
-    return {"online": online, "models": [{"name": name, "installed": name in installed}
-                                          for name in sorted(names)]}
+    result = [{"name": name, "installed": name in installed, "backend": "ollama"}
+              for name in sorted(names)]
+    model_router = getattr(getattr(request.app.state.command_center, "ai", None), "router", None)
+    if model_router is not None:
+        try:
+            remote_health = await run_in_threadpool(model_router.health)
+            configured = model_router.settings.remote_models
+            result.extend({"name": name,
+                           "installed": remote_health["model_available"],
+                           "backend": "omniroute"}
+                          for name in sorted(set(configured.values())))
+        except Exception:
+            # Backend diagnostics never prevent the local model list from loading.
+            pass
+    return {"online": online, "models": result}
 
 
 @router.post("/runtime/start")
@@ -180,6 +195,9 @@ async def stream_chat(payload: StreamRequest, request: Request):
                         metrics["output_tokens"] += event.get("output_tokens", 0)
                         metrics["model_calls"] += 1
                         metrics["model"] = event.get("model")
+                        for field in ("backend", "provider", "request_id"):
+                            if event.get(field):
+                                metrics[field] = event[field]
                         metrics["finish_reason"] = event.get("finish_reason")
                         continue
                     elif event["type"] == "tool_result":
@@ -196,6 +214,9 @@ async def stream_chat(payload: StreamRequest, request: Request):
         except ModelFailure as error:
             outcome = "error"
             yield encode(error.event())
+        except ModelRoutingError as error:
+            outcome = "error"
+            yield encode({"type": "error", "code": error.code, "message": error.message})
         except (asyncio.CancelledError, GeneratorExit):
             raise
         except Exception:

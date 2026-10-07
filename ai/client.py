@@ -32,27 +32,36 @@ except Exception:  # pragma: no cover – only exercised when Ollama is absent.
         )
 
 from ai.ollama_runtime import get_ollama_runtime
+from models.backend import LocalOllamaBackend
 
 
 class AIClient:
-    """Thin wrapper around an Ollama runtime.
+    """Backend-neutral generation client under Sentinel's model router.
 
-    The ``runtime`` argument is optional; when omitted we obtain a runtime via
-    ``get_ollama_runtime``.  The runtime is responsible for ensuring the Ollama
-    server process is running.  The ``generate`` method forwards the request to
-    the ``chat`` function imported above.
+    Local requests use the existing Ollama runtime. Remote requests go through
+    the configured OmniRoute adapter; this class does not select tools or
+    authorize their execution.
     """
 
-    def __init__(self, runtime=None):
+    def __init__(self, runtime=None, router=None):
         self.runtime = runtime if runtime is not None else get_ollama_runtime()
+        self.local_backend = LocalOllamaBackend(self.runtime, chat)
+        if router is None:
+            from models.router import ModelRouter
+            router = ModelRouter()
+        self.router = router
 
-    def generate(self, model, messages):
+    def generate(self, model, messages, *, task=None, route=None):
         """Generate a response from the configured model.
 
         If the fallback ``chat`` stub is in use, a ``NotImplementedError`` will be
         raised, making the missing dependency obvious at call time rather than
         during import.
         """
-        self.runtime.ensure_running()
-        response = chat(model=model, messages=messages)
-        return response["message"]["content"]
+        return self.router.generate(
+            task or self.router.infer_task(model),
+            model,
+            messages,
+            self.local_backend.generate,
+            route=route,
+        )
