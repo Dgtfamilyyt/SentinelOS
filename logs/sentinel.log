@@ -597,3 +597,165 @@ To make the batch script executable, save it with a `.bat` extension (e.g., `run
 2026-10-12 19:31:43,040 | INFO | HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
 2026-10-12 19:32:23,648 | INFO | HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
 2026-10-12 19:32:24,267 | INFO | HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-10-23 18:00:45,675 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-23 18:01:29,947 | INFO | Task: chat
+2026-10-23 18:01:29,947 | INFO | Model Selected: qwen3:4b
+2026-10-23 18:01:31,485 | INFO | Model request metadata: {"backend": "local", "failure_reason": "generation_failed", "fallback_used": false, "latency_ms": 1532, "model": "qwen3:4b", "provider": "ollama", "request_id": "fce1dafe39c04878a2ad3657fafce9d6", "success": false, "task_type": "chat"}
+2026-10-23 18:01:31,486 | ERROR | Web command processing failed
+Traceback (most recent call last):
+  File "C:\SentinelOS\api\app.py", line 139, in chat
+    result = await run_in_threadpool(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\to_thread.py", line 63, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2596, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 1029, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\core\command_center.py", line 102, in process
+    return self.dispatcher.dispatch(prompt, plan)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\dispatcher.py", line 58, in dispatch
+    return self.ai.ask(
+           ^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\engine.py", line 30, in ask
+    answer = self.client.generate(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\client.py", line 61, in generate
+    return self.router.generate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\models\router.py", line 224, in generate
+    result = local_generate(route.model, messages)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\models\backend.py", line 23, in generate
+    self.runtime.ensure_running()
+  File "C:\SentinelOS\ai\ollama_runtime.py", line 91, in ensure_running
+    raise OllamaRuntimeError(
+ai.ollama_runtime.OllamaRuntimeError: Ollama executable was not found. Install Ollama or add it to PATH.
+2026-10-23 18:04:11,491 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-23 18:04:32,215 | INFO | Task: chat
+2026-10-23 18:04:32,215 | INFO | Model Selected: qwen3:4b
+2026-10-23 18:04:33,731 | INFO | Model request metadata: {"backend": "local", "failure_reason": "generation_failed", "fallback_used": false, "latency_ms": 1516, "model": "qwen3:4b", "provider": "ollama", "request_id": "3ff3fd125c774be685499f405bb772f9", "success": false, "task_type": "chat"}
+2026-10-23 18:04:33,732 | ERROR | Web command processing failed
+Traceback (most recent call last):
+  File "C:\SentinelOS\api\app.py", line 181, in chat
+    result = await run_in_threadpool(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\to_thread.py", line 63, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2596, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 1029, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\core\command_center.py", line 102, in process
+    return self.dispatcher.dispatch(prompt, plan)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\dispatcher.py", line 58, in dispatch
+    return self.ai.ask(
+           ^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\engine.py", line 30, in ask
+    answer = self.client.generate(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\client.py", line 61, in generate
+    return self.router.generate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\models\router.py", line 224, in generate
+    result = local_generate(route.model, messages)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\models\backend.py", line 23, in generate
+    self.runtime.ensure_running()
+  File "C:\SentinelOS\ai\ollama_runtime.py", line 91, in ensure_running
+    raise OllamaRuntimeError(
+ai.ollama_runtime.OllamaRuntimeError: Ollama executable was not found. Install Ollama or add it to PATH.
+2026-10-23 18:04:51,056 | INFO | Task: soc
+2026-10-23 18:04:51,057 | INFO | Model Selected: CyberCrew/notmythos-8b:latest
+2026-10-23 18:04:52,593 | INFO | Model request metadata: {"backend": "local", "failure_reason": "generation_failed", "fallback_used": false, "latency_ms": 1531, "model": "CyberCrew/notmythos-8b:latest", "provider": "ollama", "request_id": "df8973fad13b4b55bf8f005855fc79a8", "success": false, "task_type": "soc"}
+2026-10-23 18:04:52,593 | ERROR | Web command processing failed
+Traceback (most recent call last):
+  File "C:\SentinelOS\api\app.py", line 181, in chat
+    result = await run_in_threadpool(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\to_thread.py", line 63, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2596, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 1029, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\core\command_center.py", line 102, in process
+    return self.dispatcher.dispatch(prompt, plan)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\dispatcher.py", line 58, in dispatch
+    return self.ai.ask(
+           ^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\engine.py", line 30, in ask
+    answer = self.client.generate(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\client.py", line 61, in generate
+    return self.router.generate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\models\router.py", line 224, in generate
+    result = local_generate(route.model, messages)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\models\backend.py", line 23, in generate
+    self.runtime.ensure_running()
+  File "C:\SentinelOS\ai\ollama_runtime.py", line 91, in ensure_running
+    raise OllamaRuntimeError(
+ai.ollama_runtime.OllamaRuntimeError: Ollama executable was not found. Install Ollama or add it to PATH.
+2026-10-23 18:05:48,918 | INFO | Task: soc
+2026-10-23 18:05:48,918 | INFO | Model Selected: CyberCrew/notmythos-8b:latest
+2026-10-23 18:05:50,450 | INFO | Model request metadata: {"backend": "local", "failure_reason": "generation_failed", "fallback_used": false, "latency_ms": 1531, "model": "CyberCrew/notmythos-8b:latest", "provider": "ollama", "request_id": "ba434af2aa524206a7e5817b2d57909a", "success": false, "task_type": "soc"}
+2026-10-23 18:05:50,451 | ERROR | Web command processing failed
+Traceback (most recent call last):
+  File "C:\SentinelOS\api\app.py", line 181, in chat
+    result = await run_in_threadpool(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\starlette\concurrency.py", line 34, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\to_thread.py", line 63, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 2596, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\SentinelOS\.venv\Lib\site-packages\anyio\_backends\_asyncio.py", line 1029, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\core\command_center.py", line 102, in process
+    return self.dispatcher.dispatch(prompt, plan)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\dispatcher.py", line 58, in dispatch
+    return self.ai.ask(
+           ^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\engine.py", line 30, in ask
+    answer = self.client.generate(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\ai\client.py", line 61, in generate
+    return self.router.generate(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\models\router.py", line 224, in generate
+    result = local_generate(route.model, messages)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\SentinelOS\models\backend.py", line 23, in generate
+    self.runtime.ensure_running()
+  File "C:\SentinelOS\ai\ollama_runtime.py", line 91, in ensure_running
+    raise OllamaRuntimeError(
+ai.ollama_runtime.OllamaRuntimeError: Ollama executable was not found. Install Ollama or add it to PATH.

@@ -122,37 +122,6 @@ async def forget(memory_id: str, request: Request):
     return {"deleted": True}
 
 
-@router.get("/models")
-async def models(request: Request):
-    runtime = request.app.state.ollama_runtime
-    installed = set()
-    online = False
-    try:
-        async with httpx.AsyncClient(timeout=2, trust_env=False) as client:
-            response = await client.get(runtime.base_url + "/api/tags")
-            response.raise_for_status()
-            installed = {model["name"] for model in response.json()["models"]}
-            online = True
-    except (httpx.HTTPError, ValueError, KeyError):
-        pass
-    names = installed | {model["name"] for model in MODELS.values()}
-    result = [{"name": name, "installed": name in installed, "backend": "ollama"}
-              for name in sorted(names)]
-    model_router = getattr(getattr(request.app.state.command_center, "ai", None), "router", None)
-    if model_router is not None:
-        try:
-            remote_health = await run_in_threadpool(model_router.health)
-            configured = model_router.settings.remote_models
-            result.extend({"name": name,
-                           "installed": remote_health["model_available"],
-                           "backend": "omniroute"}
-                          for name in sorted(set(configured.values())))
-        except Exception:
-            # Backend diagnostics never prevent the local model list from loading.
-            pass
-    return {"online": online, "models": result}
-
-
 @router.post("/runtime/start")
 async def start_runtime(request: Request):
     try:

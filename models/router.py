@@ -60,6 +60,7 @@ class ModelRouter:
         self._installed_local_models = set()
         self._installed_local_models_at = 0.0
         self._config_error = None
+        self._provider = None
         try:
             self.settings = settings or RoutingSettings.from_env()
         except RoutingConfigurationError as error:
@@ -69,6 +70,32 @@ class ModelRouter:
             from models.omniroute import OmniRouteBackend
             omni_backend = OmniRouteBackend()
         self.omni_backend = omni_backend
+
+    def get_provider(self):
+        """Return the active model provider abstraction."""
+        if self._provider is not None:
+            return self._provider
+        from models.provider import OllamaProvider, OmniRouteProvider
+        if self.settings.policy == "omniroute":
+            return OmniRouteProvider(self.omni_backend)
+        return OllamaProvider()
+
+    def set_provider(self, provider):
+        """Set or override the active model provider (e.g. for testing)."""
+        self._provider = provider
+
+    def check_runtime_availability(self):
+        """Query active provider runtime availability."""
+        return self.get_provider().check_runtime()
+
+    def discover_installed_models(self):
+        """Discover actual models installed in the active provider."""
+        return self.get_provider().list_models()
+
+    def get_model_readiness(self, model_id=None):
+        """Check readiness of a specific model or any configured model."""
+        target = model_id or self.choose("chat")
+        return self.get_provider().get_model_status(target)
 
     def choose(self, task):
         """Return Sentinel's existing local model choice for compatibility."""
@@ -157,6 +184,9 @@ class ModelRouter:
             )
 
     def _is_installed_local_model(self, model):
+        if self._provider is not None:
+            models = self._provider.list_models()
+            return any(m.name == model or m.id == model for m in models)
         if model in self._local_model_ids:
             return True
         now = time.monotonic()
@@ -188,7 +218,10 @@ class ModelRouter:
         fallback_used = False
         try:
             if route.backend == "local":
-                result = local_generate(route.model, messages)
+                if self._provider is not None:
+                    result = self._provider.generate(route.model, messages)
+                else:
+                    result = local_generate(route.model, messages)
             else:
                 result = self.omni_backend.generate(route, messages)
             self._log_result(route, request_id, started, True)
@@ -199,7 +232,10 @@ class ModelRouter:
                 fallback_used = True
                 fallback_route = ModelRoute("local", route.task, route.local_model, route.local_model, "ollama")
                 try:
-                    result = local_generate(fallback_route.model, messages)
+                    if self._provider is not None:
+                        result = self._provider.generate(fallback_route.model, messages)
+                    else:
+                        result = local_generate(fallback_route.model, messages)
                     self._log_result(route, request_id, started, True, failure_reason, fallback_used=True)
                     return result
                 except Exception:

@@ -21,8 +21,10 @@ from api.conversations import router as conversations_router
 from api.voice import router as voice_router
 from api.agent import router as agent_router
 from api.molecular import router as molecular_router
+from api.models import router as models_router
 from models.router import ModelRoutingError
 from models.omniroute import BackendFailure
+from models.provider import ProviderError
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -132,6 +134,48 @@ async def chat(payload: ChatRequest, request: Request):
     center = request.app.state.command_center
     command_lock = request.app.state.command_lock
 
+    msg = payload.message.strip()
+    if msg.lower() == "/clear":
+        async with command_lock:
+            if hasattr(center.ai, "conversation"):
+                center.ai.conversation.clear()
+            else:
+                center.ai.clear()
+        return ChatResponse(reply="Conversation session cleared.", kind="assistant")
+
+    if msg.lower() == "/status":
+        state = center.agent_state
+        status_line = "RUNNING" if state.get("is_running") else "IDLE"
+        history_cnt = state.get("task_history_count", 0)
+        return ChatResponse(
+            reply=f"Agent Status: {status_line} | Completed Tasks: {history_cnt}",
+            kind="tool",
+            details=state,
+        )
+
+    if msg.lower() == "/targets":
+        targets = center.authorized_targets
+        if targets:
+            formatted = "\n".join(
+                f"[{t.get('auth_level', 'LAB').upper()}] {t.get('label', 'target')}: {', '.join(t.get('targets', []))}"
+                for t in targets
+            )
+            return ChatResponse(
+                reply=f"Authorized Lab Targets:\n{formatted}",
+                kind="tool",
+                details={"targets": targets},
+            )
+        return ChatResponse(
+            reply="No lab targets configured. Edit config/authorized_targets.yaml",
+            kind="tool",
+            details={"targets": []},
+        )
+
+    if msg.lower() == "/stop":
+        stopped = center.stop_agent()
+        reply_txt = "Agent execution stopped." if stopped else "No agent currently running."
+        return ChatResponse(reply=reply_txt, kind="assistant")
+
     try:
         async with command_lock:
             result = await run_in_threadpool(
@@ -148,6 +192,11 @@ async def chat(payload: ChatRequest, request: Request):
         raise HTTPException(
             status_code=503,
             detail={"code": error.code, "message": str(error)},
+        ) from error
+    except ProviderError as error:
+        raise HTTPException(
+            status_code=503,
+            detail={"code": error.code, "message": error.message},
         ) from error
     except Exception as error:
         logger.exception(
@@ -233,6 +282,7 @@ def create_app(
     app.include_router(voice_router)
     app.include_router(agent_router)
     app.include_router(molecular_router)
+    app.include_router(models_router)
     app.mount(
         "/static",
         StaticFiles(directory=WEB_DIR),
