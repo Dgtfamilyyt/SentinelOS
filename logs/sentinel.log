@@ -759,3 +759,9 @@ Traceback (most recent call last):
   File "C:\SentinelOS\ai\ollama_runtime.py", line 91, in ensure_running
     raise OllamaRuntimeError(
 ai.ollama_runtime.OllamaRuntimeError: Ollama executable was not found. Install Ollama or add it to PATH.
+2026-10-23 23:52:36,389 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-23 23:53:09,683 | INFO | Model request metadata: {"backend": "local", "failure_reason": "ollama_unavailable", "fallback_used": false, "latency_ms": 2297, "model": "qwen3:4b", "provider": "ollama", "request_id": "332a37361f9743fa9e3f9cf2bfe8bd9d", "success": false, "task_type": "chat"}
+2026-10-23 23:54:41,262 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-24 00:33:58,166 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-24 00:45:34,605 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied
+2026-10-24 00:59:48,344 | INFO | AuthorizationModel: loaded 0 authorized targets, 0 denied

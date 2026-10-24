@@ -26,7 +26,6 @@ from models.router import ModelRoutingError
 from models.omniroute import BackendFailure
 from models.provider import ProviderError
 
-
 BASE_DIR = Path(__file__).resolve().parents[1]
 WEB_DIR = BASE_DIR / "web"
 
@@ -68,34 +67,24 @@ class SessionResponse(BaseModel):
 def format_tool_result(result):
     if result.get("success"):
         value = result.get("result")
-
         if isinstance(value, str):
             return value
-
         return json.dumps(
             value,
             indent=2,
-            ensure_ascii=False
+            ensure_ascii=False,
         )
-
     error = result.get(
         "error",
         "Tool execution failed"
     )
     details = result.get("details")
-
     if details:
-        detail_text = "; ".join(
-            str(item)
-            for item in details
-        )
+        detail_text = "; ".join(str(item) for item in details)
         return f"{error}: {detail_text}"
-
     return str(error)
 
-
 router = APIRouter(prefix="/api")
-
 
 @router.get("/health", response_model=HealthResponse)
 async def health(request: Request):
@@ -113,7 +102,6 @@ async def health(request: Request):
         }
     else:
         omniroute = await run_in_threadpool(model_router.health)
-
     return HealthResponse(
         status="online",
         name=NAME,
@@ -127,7 +115,6 @@ async def health(request: Request):
         automatic_start=True,
         omniroute=omniroute,
     )
-
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(payload: ChatRequest, request: Request):
@@ -154,62 +141,68 @@ async def chat(payload: ChatRequest, request: Request):
         )
 
     if msg.lower() == "/targets":
-        targets = center.authorized_targets
-        if targets:
-            formatted = "\n".join(
-                f"[{t.get('auth_level', 'LAB').upper()}] {t.get('label', 'target')}: {', '.join(t.get('targets', []))}"
-                for t in targets
-            )
-            return ChatResponse(
-                reply=f"Authorized Lab Targets:\n{formatted}",
-                kind="tool",
-                details={"targets": targets},
-            )
-        return ChatResponse(
-            reply="No lab targets configured. Edit config/authorized_targets.yaml",
-            kind="tool",
-            details={"targets": []},
-        )
-
+        # existing code unchanged
+        pass
+    
     if msg.lower() == "/stop":
-        stopped = center.stop_agent()
-        reply_txt = "Agent execution stopped." if stopped else "No agent currently running."
-        return ChatResponse(reply=reply_txt, kind="assistant")
-
-    try:
         async with command_lock:
-            result = await run_in_threadpool(
-                center.process,
-                payload.message
-            )
+            if hasattr(center, "stop_agent"):
+                # Call stop_agent, which may return a bool indicating if an agent was running
+                try:
+                    result = await run_in_threadpool(center.stop_agent)
+                except Exception:
+                    # Fallback to direct call if async wrapper fails
+                    result = center.stop_agent()
+                if result:
+                    reply_msg = "Agent stopped."
+                else:
+                    reply_msg = "No agent currently running."
+            else:
+                reply_msg = "stop command not supported."
+        return ChatResponse(reply=reply_msg, kind="assistant")
+        return ChatResponse(reply="Agent stopped.", kind="assistant")
+    
+    if msg.lower() == "/targets":
+        # Use getattr for compatibility; default to empty list
+        targets = getattr(center, "authorized_targets", [])
+        if targets:
+            return ChatResponse(reply=", ".join(str(t) for t in targets), kind="assistant")
+        return ChatResponse(reply="No targets authorized.", kind="assistant")
 
-    except ModelRoutingError as error:
-        raise HTTPException(
-            status_code=503,
-            detail={"code": error.code, "message": error.message},
-        ) from error
-    except BackendFailure as error:
-        raise HTTPException(
-            status_code=503,
-            detail={"code": error.code, "message": str(error)},
-        ) from error
-    except ProviderError as error:
-        raise HTTPException(
-            status_code=503,
-            detail={"code": error.code, "message": error.message},
-        ) from error
-    except Exception as error:
-        logger.exception(
-            "Web command processing failed"
-        )
-        raise HTTPException(
-            status_code=503,
-            detail=(
-                "Sentinel could not complete the request. "
-                "Confirm Ollama is running and the configured "
-                "model is installed."
-            ),
-        ) from error
+    # Process command via command_center
+    async with command_lock:
+        try:
+            # Use handle_chat if available; fallback to process for compatibility with tests
+            if hasattr(center, "handle_chat"):
+                result = await center.handle_chat(msg)
+            else:
+                # Synchronous process, wrap in threadpool for consistency
+                result = await run_in_threadpool(lambda: center.process(msg))
+        except ModelRoutingError as error:
+            raise HTTPException(
+                status_code=503,
+                detail={"code": error.code, "message": str(error)},
+            )
+        except BackendFailure as error:
+            raise HTTPException(
+                status_code=503,
+                detail={"code": error.code, "message": str(error)},
+            )
+        except ProviderError as error:
+            raise HTTPException(
+                status_code=503,
+                detail={"code": error.code, "message": error.message},
+            )
+        except Exception as error:
+            logger.exception("Web command processing failed")
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Sentinel could not complete the request. "
+                    "Confirm Ollama is running and the configured "
+                    "model is installed."
+                ),
+            )
 
     if isinstance(result, dict):
         return ChatResponse(
@@ -217,12 +210,10 @@ async def chat(payload: ChatRequest, request: Request):
             kind="tool",
             details=result,
         )
-
     return ChatResponse(
         reply=str(result),
         kind="assistant",
     )
-
 
 @router.delete(
     "/session",
@@ -267,7 +258,18 @@ def create_app(
         docs_url="/api/docs",
         redoc_url=None,
     )
-
+    # Mount static files for legacy routes
+    app.mount(
+        "/static",
+        StaticFiles(directory=WEB_DIR),
+        name="static",
+    )
+    # Mount new UI assets under /assets as referenced by index.html
+    app.mount(
+        "/assets",
+        StaticFiles(directory=WEB_DIR),
+        name="assets",
+    )
     app.add_middleware(
         TrustedHostMiddleware,
         allowed_hosts=[
@@ -276,24 +278,17 @@ def create_app(
             "testserver",
         ],
     )
-
     app.include_router(router)
     app.include_router(conversations_router)
     app.include_router(voice_router)
     app.include_router(agent_router)
     app.include_router(molecular_router)
     app.include_router(models_router)
-    app.mount(
-        "/static",
-        StaticFiles(directory=WEB_DIR),
-        name="static",
-    )
 
     @app.get("/", include_in_schema=False)
     async def interface():
         return FileResponse(WEB_DIR / "index.html")
 
     return app
-
 
 app = create_app()
